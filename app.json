@@ -1,0 +1,7 @@
+{
+  "name": "SOCKS5 proxy",
+  "description": "Basic SOCKS5 proxy",
+  "repository": "https://github.com/UWNetworksLab/colony.git",
+  "logo": "https://www.uproxy.org/images/uproxy_logo.svg",
+  "keywords": ["node", "socks5", "socks"]
+}

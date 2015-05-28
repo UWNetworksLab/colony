@@ -2,7 +2,7 @@
   "name": "colony",
   "version": "1.0.0",
   "description": "Setup VPN/Proxy colonies in the cloud",
-  "main": "index.js",
+  "main": "server/heroku/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
