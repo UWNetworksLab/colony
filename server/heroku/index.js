@@ -1,5 +1,7 @@
+var http = require("http");
 var socks = require("socksv5");
-var PORT = 8000;
+var PROXY_PORT = 8000;
+var HTTP_PORT = 5000;
 
 var server = socks.createServer(function(info, accept, deny) {
   accept();
@@ -7,7 +9,13 @@ var server = socks.createServer(function(info, accept, deny) {
 
 server.useAuth(socks.auth.None());
 
-server.listen(PORT, "localhost", function() {
-  console.log("Listening on port " + PORT);
+server.listen(PROXY_PORT, "localhost", function() {
+  console.log("Listening on port " + PROXY_PORT);
 });
+
+http.createServer(function (req, res) {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.write('Hello World!' + '\n' + JSON.stringify(req.headers, true, 2));
+  res.end();
+}).listen(HTTP_PORT);
 
