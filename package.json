@@ -1,0 +1,26 @@
+{
+  "name": "colony",
+  "version": "1.0.0",
+  "description": "Setup VPN/Proxy colonies in the cloud",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "contributors": [
+    "Raymond Cheng <ryscheng@cs.washington.edu> (https://raymondcheng.net)",
+    "Will Scott <willscott@gmail.com> (https://wills.co.tt)"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/UWNetworksLab/colony.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/UWNetworksLab/colony/issues"
+  },
+  "homepage": "https://github.com/UWNetworksLab/colony",
+  "dependencies": {
+    "socksv5": "0.0.6"
+  }
+}
