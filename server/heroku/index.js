@@ -1,7 +1,7 @@
 var http = require("http");
 var socks = require("socksv5");
-var PROXY_PORT = 8000;
-var HTTP_PORT = (process.env.PORT || 5000);
+var PROXY_PORT = (process.env.PORT || 8000);
+var HTTP_PORT = (5000);
 
 var server = socks.createServer(function(info, accept, deny) {
   accept();
