@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/UWNetworksLab/colony",
   "dependencies": {
+    "http-proxy": "^1.11.1",
     "socksv5": "0.0.6"
   }
 }
