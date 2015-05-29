@@ -23,5 +23,10 @@
   "dependencies": {
     "http-proxy": "^1.11.1",
     "socksv5": "0.0.6"
+  },
+  "devDependencies": {
+    "browserify": "^10.2.3",
+    "digitalocean-api": "^0.1.1",
+    "gulp": "^3.8.11"
   }
 }
