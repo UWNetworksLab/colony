@@ -15,6 +15,7 @@ var jshint = require("gulp-jshint");
 var browserify = require("browserify");
 var source = require("vinyl-source-stream");
 var buffer = require("vinyl-buffer");
+var pkgify = require("pkgify");
 var path = require("path");
 
 gulp.task("build_digitalocean", function() {
@@ -25,6 +26,11 @@ gulp.task("build_digitalocean", function() {
     return browserify({
       entries: [ entry ],
       debug: true
+    }).transform(pkgify, {
+      packages: {
+        request: path.relative(__dirname, require.resolve("browser-request"))
+      },
+      relativeTo: __dirname
     }).bundle()
       .pipe(source(filename))
       .pipe(buffer())
