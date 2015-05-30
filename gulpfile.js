@@ -34,7 +34,7 @@ gulp.task("build_digitalocean", function() {
     }).bundle()
       .pipe(source(filename))
       .pipe(buffer())
-      .pipe(gulp.dest("./client/build/"));
+      .pipe(gulp.dest("./client/www/build/"));
   };
   return bundle();
 });

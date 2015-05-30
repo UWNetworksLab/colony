@@ -1,5 +1,5 @@
 # browserify
-client/build/
+client/www/build/
 
 # Logs
 logs
