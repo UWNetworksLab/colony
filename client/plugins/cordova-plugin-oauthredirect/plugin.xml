@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="cordova-plugin-oauthredirect" version="0.2.3">
+  <name>oAuth Redirect</name>
+  <description>Captures an oAuth Token and redirects back to app</description>
+  <license>Apache 2.0</license>
+  <keywords>cordova,oauth</keywords>
+  <js-module src="www/oauthredirect.js" name="oauthredirect">
+    <clobbers target="oauthredirect" />
+  </js-module>
+  <platform name="android">
+    <config-file target="config.xml" parent="/*">
+      <feature name="Device">
+        <param name="ios-package" value="CDVDevice"/>
+      </feature>
+    </config-file>
+    <source-file src="src/android/OAuthRedirect.java" />
+  </platform>
+</plugin>
