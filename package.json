@@ -27,6 +27,7 @@
   "devDependencies": {
     "browser-request": "^0.3.3",
     "browserify": "^10.2.3",
+    "cordova": "^5.0.0",
     "digitalocean-api": "^0.1.1",
     "gulp": "^3.8.11",
     "gulp-jshint": "^1.11.0",
