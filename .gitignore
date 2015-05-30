@@ -33,19 +33,30 @@ node_modules
 # built application files
 *.apk
 *.ap_
-# files for the dex VM
+*.modl
 *.dex
-# Java class files
 *.class
+# gradle
+.gradletasknamecache
+.gradle/
 # generated files - android project subfolder
 Android/bin/
 Android/gen/
 Android/assets/
 # generated files
+build/
 bin/
 gen/
 # Local configuration file (sdk path, etc)
 local.properties
+# Eclipse
+.classpath
+.project
+# Intellij
+.idea/
+*.iml
+*.ipr
+*.iws
 
 # IOS / Xcode
 build/*
