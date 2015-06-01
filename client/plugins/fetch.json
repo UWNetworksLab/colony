@@ -10,7 +10,7 @@
     "cordova-plugin-oauthredirect": {
         "source": {
             "type": "local",
-            "path": "plugins/cordova-plugin-oauthredirect"
+            "path": "plugin-dev/cordova-plugin-oauthredirect"
         },
         "is_top_level": true,
         "variables": {}
