@@ -17,6 +17,7 @@ var source = require("vinyl-source-stream");
 var buffer = require("vinyl-buffer");
 var pkgify = require("pkgify");
 var path = require("path");
+var spawn = require("child_process").spawn;
 
 gulp.task("build_digitalocean", function() {
   "use strict";
@@ -47,6 +48,25 @@ gulp.task("lint", function() {
     ]).pipe(jshint({ lookup: true }))
     .pipe(jshint.reporter("default"));
 });
+
+var cordovaTask = function(args, cb) {
+  var proc = spawn(require.resolve("cordova/bin/cordova"), args, {
+    cwd: "client/"
+  });
+  proc.stdout.on('data', function (data) {
+    console.log(data.toString().trim());
+  });
+  proc.stderr.on('data', function (data) {
+    console.log('stderr: ' + data);
+  });
+  proc.on('close', function (code) {
+    console.log('child process exited with code ' + code);
+    cb();
+  });
+};
+
+gulp.task("cordova_build", cordovaTask.bind({}, [ "build" ]));
+gulp.task("cordova_emulate", cordovaTask.bind({}, [ "emulate", "android" ]));
 
 gulp.task("build", [ "build_digitalocean" ]);
 gulp.task("test", [ "lint" ]);
