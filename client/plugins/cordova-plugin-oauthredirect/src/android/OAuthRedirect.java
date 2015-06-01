@@ -31,5 +31,3 @@ public class OAuthRedirect extends CordovaPlugin {
   }
 }
 
-
-
