@@ -1,21 +1,12 @@
 var http = require("http");
-var socks = require("socksv5");
+var httpProxy = require("http-proxy");
 var PROXY_PORT = (process.env.PORT || 8000);
-var HTTP_PORT = (5000);
 
-var server = socks.createServer(function(info, accept, deny) {
-  accept();
-});
-
-server.useAuth(socks.auth.None());
-
-server.listen(PROXY_PORT, "localhost", function() {
-  console.log("Listening on port " + PROXY_PORT);
-});
-
-http.createServer(function (req, res) {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.write('Hello World!' + '\n' + JSON.stringify(req.headers, true, 2));
-  res.end();
-}).listen(HTTP_PORT);
-
+var proxy = httpProxy.createProxyServer({});
+ 
+// Create your target server 
+var server = http.createServer(function (req, res) {
+  //@todo Get the desired target out from a hidden header (e.g. X-COLONY-HOST)
+  req.headers.host = "wikipedia.org";
+  proxy.web(req, res, { target: "http://www.wikipedia.org" });
+}).listen(PROXY_PORT);
