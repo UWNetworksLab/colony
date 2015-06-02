@@ -37,7 +37,7 @@ gulp.task("build_digitalocean", function() {
     }).bundle()
       .pipe(source(filename))
       .pipe(buffer())
-      .pipe(gulp.dest("./client/build/www/build/"));
+      .pipe(gulp.dest("./client/www/build/"));
   };
   return bundle();
 });
@@ -51,6 +51,7 @@ gulp.task("lint", function() {
     .pipe(jshint.reporter("default"));
 });
 
+/**
 var cordovaTask = function(args, cb) {
   var proc = spawn(require.resolve("cordova/bin/cordova"), args, {
     cwd: "client/build"
@@ -66,7 +67,6 @@ var cordovaTask = function(args, cb) {
     cb(code);
   });
 };
-
 gulp.task("cordova_create", function(cb) {
   spawn(
     require.resolve("cordova/bin/cordova"), 
@@ -94,5 +94,7 @@ gulp.task("build", gulpSequence(
   "cordova_build",
   "cordova_emulate"
 ));
+**/
+gulp.task("build", [ "build_digitalocean" ]);
 gulp.task("test", [ "lint" ]);
 gulp.task("default", [ "build", "test" ]);
