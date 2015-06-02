@@ -11,6 +11,8 @@
  *  - Generate jsdoc documentation
  **/
 var gulp = require("gulp");
+var gulpSequence = require("gulp-sequence");
+var fs = require("fs-extra");
 var jshint = require("gulp-jshint");
 var browserify = require("browserify");
 var source = require("vinyl-source-stream");
@@ -35,7 +37,7 @@ gulp.task("build_digitalocean", function() {
     }).bundle()
       .pipe(source(filename))
       .pipe(buffer())
-      .pipe(gulp.dest("./client/www/build/"));
+      .pipe(gulp.dest("./client/build/www/build/"));
   };
   return bundle();
 });
@@ -51,7 +53,7 @@ gulp.task("lint", function() {
 
 var cordovaTask = function(args, cb) {
   var proc = spawn(require.resolve("cordova/bin/cordova"), args, {
-    cwd: "client/"
+    cwd: "client/build"
   });
   proc.stdout.on('data', function (data) {
     console.log(data.toString().trim());
@@ -65,9 +67,32 @@ var cordovaTask = function(args, cb) {
   });
 };
 
+gulp.task("cordova_create", function(cb) {
+  spawn(
+    require.resolve("cordova/bin/cordova"), 
+    [ "create", "build", "org.uproxy.colony", "Colony" ], 
+    { cwd: "client" }
+  ).on("close", function(code) { cb(); })
+});
+gulp.task("cordova_platform_android", cordovaTask.bind({}, [ "platform", "add", "android" ]));
+gulp.task("cordova_plugin_oauthredirect", cordovaTask.bind({}, [ "plugin", "add", "../plugins/cordova-plugin-oauthredirect" ]));
 gulp.task("cordova_build", cordovaTask.bind({}, [ "build" ]));
 gulp.task("cordova_emulate", cordovaTask.bind({}, [ "emulate", "android" ]));
+gulp.task("setup_www", function(cb) {
+  fs.copy("client/www/*", "client/build/www/", cb); 
+});
+gulp.task("clean", function(cb) {
+  fs.remove("client/build", function() { cb(); });
+});
 
-gulp.task("build", [ "build_digitalocean" ]);
+gulp.task("build", gulpSequence(
+  "cordova_create",
+  "cordova_platform_android",
+  "cordova_plugin_oauthredirect",
+  "setup_www",
+  "build_digitalocean",
+  "cordova_build",
+  "cordova_emulate"
+));
 gulp.task("test", [ "lint" ]);
 gulp.task("default", [ "build", "test" ]);
