@@ -30,7 +30,7 @@ build/Release
 node_modules/
 
 ### Cordova
-platforms/
+client/build/
 
 # ANDROID / ECLIPSE
 # built application files
