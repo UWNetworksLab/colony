@@ -63,7 +63,7 @@ var cordovaTask = function(args, cb) {
   });
   proc.on('close', function (code) {
     console.log('child process exited with code ' + code);
-    cb();
+    cb(code);
   });
 };
 
@@ -75,7 +75,7 @@ gulp.task("cordova_create", function(cb) {
   ).on("close", function(code) { cb(); })
 });
 gulp.task("cordova_platform_android", cordovaTask.bind({}, [ "platform", "add", "android" ]));
-gulp.task("cordova_plugin_oauthredirect", cordovaTask.bind({}, [ "plugin", "add", "../plugins/cordova-plugin-oauthredirect" ]));
+gulp.task("cordova_plugin_oauthredirect", cordovaTask.bind({}, [ "plugin", "add", "../plugins/cordova-plugin-oauthredirect/" ]));
 gulp.task("cordova_build", cordovaTask.bind({}, [ "build" ]));
 gulp.task("cordova_emulate", cordovaTask.bind({}, [ "emulate", "android" ]));
 gulp.task("setup_www", function(cb) {
