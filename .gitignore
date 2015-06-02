@@ -1,3 +1,6 @@
+# browserify
+client/www/build
+
 # Logs
 logs
 *.log
