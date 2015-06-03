@@ -41,7 +41,7 @@ public class WebServer extends NanoHTTPD {
     StringBuilder buf = new StringBuilder();
     for (Entry<String, String> kv: session.getParms().entrySet()) {
       if (kv.getKey().equals("code")) { // Digital Ocean
-        this.code = kv.getvalue();
+        this.code = kv.getValue();
         buf.append(kv.getValue());
       }
     }

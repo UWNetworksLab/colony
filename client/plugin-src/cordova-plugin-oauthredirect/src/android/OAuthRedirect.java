@@ -16,12 +16,12 @@ import android.util.Log;
 */
 public class OAuthRedirect extends CordovaPlugin {
   private static final int PORT = 10101;
-  private WebServer digitalOceanServer;
+  private WebServer server;
 
   @Override
   protected void pluginInitialize() {
     try {
-      digitalOceanServer = new WebServer(PORT);
+      server = new WebServer(PORT); // Digital ocean
     } catch(IOException e) {
       Log.e(this.getClass().getName(), e.getMessage());
     }
@@ -67,7 +67,12 @@ public class OAuthRedirect extends CordovaPlugin {
   }
 
   private void getCode(CallbackContext callbackContext) {
-    callbackContext.success(server.getCode());
+    String code = server.getCode();
+    if (code == null) {
+      callbackContext.error("Server hasn't received any oAuth codes");
+    } else {
+      callbackContext.success(server.getCode());
+    }
   }
 }
 
