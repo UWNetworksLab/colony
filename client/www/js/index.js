@@ -35,7 +35,9 @@ app.codeProbe = function() {
       setTimeout(app.codeProbe, app.PROBE_TIMEOUT);    
     } else {
       console.log(code);
-      window.oauth.stopListening(function() {});
+      setTimeout(function() {
+        window.oauth.stopListening(function() {});
+      },1000);
       document.getElementById("title").appendChild(document.createTextNode(code))
     }
   });
