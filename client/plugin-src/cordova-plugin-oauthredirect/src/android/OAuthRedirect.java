@@ -24,7 +24,7 @@ public class OAuthRedirect extends CordovaPlugin {
       server = new WebServer(PORT);
       server.start();
     } catch(IOException e) {
-      Log.i("!!!", "!!!");
+      Log.e(this.getClass().getName(), e.getMessage());
     }
   }
 

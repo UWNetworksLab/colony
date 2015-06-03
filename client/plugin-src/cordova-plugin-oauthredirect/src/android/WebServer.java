@@ -12,7 +12,6 @@ public class WebServer extends NanoHTTPD {
 
   public WebServer(int port) throws IOException {
     super(port);
-    Log.i("!!!", "!!!");
   }
 
   @Override
@@ -32,7 +31,15 @@ public class WebServer extends NanoHTTPD {
     });
     **/
 
-    final String html = "<html><head><head><body><h1>Hello, World</h1></body></html>";
-    return this.newFixedLengthResponse(html);
+    //session.getQueryParameterString();
+    StringBuilder buf = new StringBuilder();
+    for (Entry<String, String> kv: session.getParms().entrySet()) {
+      if (kv.getKey().equals("code")) { // Digital Ocean
+        buf.append(kv.getValue());
+      }
+    }
+
+    //final String html = "<html><head><head><body><h1>Hello, World</h1></body></html>";
+    return this.newFixedLengthResponse(buf.toString());
   }
 }
