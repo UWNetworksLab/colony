@@ -82,18 +82,16 @@ gulp.task("setup_www", function(cb) {
     fs.symlink("../www", "client/build/www", cb); 
   });
 });
-gulp.task("clean", function(cb) {
-  fs.remove("client/build", function() { cb(); });
-});
 
-gulp.task("build", gulpSequence(
+gulp.task("setup", gulpSequence(
   "cordova_create",
   "cordova_platform_android",
   "cordova_plugin_oauthredirect",
   "setup_www",
-  "build_digitalocean",
   "cordova_build",
   "cordova_emulate"
 ));
+gulp.task("build", [ "build_digitalocean" ]);
+gulp.task("clean", function(cb) { fs.remove("client/build", function() { cb(); }); });
 gulp.task("test", [ "lint" ]);
 gulp.task("default", [ "build", "test" ]);
