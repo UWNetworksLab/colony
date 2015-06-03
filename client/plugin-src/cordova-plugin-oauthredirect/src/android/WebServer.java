@@ -4,17 +4,19 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.io.IOException;
 
-asfadsf
+import android.util.Log;
+
+import fi.iki.elonen.NanoHTTPD;
 
 public class WebServer extends NanoHTTPD {
-  private static final int PORT = 10101;
 
-  public WebServer() throws IOException {
-    super(PORT, null);
+  public WebServer(int port) throws IOException {
+    super(port);
+    Log.i("!!!", "!!!");
   }
 
   @Override
-  public Response serve(String uri, String method, Properties header, Properties parms, Properties files) {
+  public Response serve(IHTTPSession session) {
     /**
     final StringBuilder buf = new StringBuilder();
 
@@ -31,6 +33,6 @@ public class WebServer extends NanoHTTPD {
     **/
 
     final String html = "<html><head><head><body><h1>Hello, World</h1></body></html>";
-    return new NanoHTTPD.Response(HTTP_OK, MIME_HTML, html);
+    return this.newFixedLengthResponse(html);
   }
 }

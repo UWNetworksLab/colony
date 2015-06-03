@@ -5,6 +5,8 @@ window.echo = function(str, callback) {
   }, "OAuthRedirect", "echo", [str]);
 };
 
-//window.echo("echome", function(echoValue) {
-//  alert(echoValue == "echome"); // should alert true.
-//});
+/**
+window.echo("echome", function(echoValue) {
+  alert(echoValue == "echome"); // should alert true.
+});
+**/

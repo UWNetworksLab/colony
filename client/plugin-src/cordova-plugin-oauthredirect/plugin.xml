@@ -19,6 +19,8 @@
     </config-file>
 
     <source-file src="src/android/OAuthRedirect.java" target-dir="src/org/apache/cordova/oauthredirect" />
+    <source-file src="src/android/WebServer.java" target-dir="src/org/apache/cordova/oauthredirect" />
+    <source-file src="src/android/NanoHTTPD.java" target-dir="src/org/apache/cordova/oauthredirect" />
 
     <js-module src="oauthredirect.js" name="oauthredirect">
       <clobbers target="oauthredirect" />
