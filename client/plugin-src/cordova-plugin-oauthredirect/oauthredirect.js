@@ -14,6 +14,7 @@ window.oauth.startListening = window.oauth.genericHandler.bind({}, "startListeni
 window.oauth.stopListening = window.oauth.genericHandler.bind({}, "stopListening", []);
 window.oauth.getCode = window.oauth.genericHandler.bind({}, "getCode", []);
 
+window.oauth.startListening(function() {});
 /**
 window.echo("echome", function(echoValue) {
   alert(echoValue == "echome"); // should alert true.

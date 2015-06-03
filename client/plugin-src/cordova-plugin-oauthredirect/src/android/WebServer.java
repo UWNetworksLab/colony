@@ -23,12 +23,6 @@ public class WebServer extends NanoHTTPD {
   @Override
   public Response serve(IHTTPSession session) {
     /**
-    final StringBuilder buf = new StringBuilder();
-
-    for (Entry<Object, Object> kv : header.entrySet()) {
-      buf.append(kv.getKey() + " : " + kv.getValue() + "\n");
-    }
-
     handler.post(new Runnable() {
       @Override
       public void run() {
@@ -46,7 +40,13 @@ public class WebServer extends NanoHTTPD {
       }
     }
 
-    //final String html = "<html><head><head><body><h1>Hello, World</h1></body></html>";
-    return this.newFixedLengthResponse(buf.toString());
+    String html = "<html><head><head><body>" + 
+      buf.toString() + 
+      "<br>" + 
+      "<a href='intent:#Intent;action=;end'>Go back</a>"
+      "</body><script>" +
+      //"window.open()" +
+      "</script></html>";
+    return this.newFixedLengthResponse(html);
   }
 }
