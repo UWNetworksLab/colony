@@ -43,9 +43,9 @@ public class WebServer extends NanoHTTPD {
     String html = "<html><head><head><body>" + 
       buf.toString() + 
       "<br>" + 
-      "<a href='intent:#Intent;action=;end'>Go back</a>"
+      "<a href='INTENT_TO_APP'>Go Back</a>"
       "</body><script>" +
-      //"window.open()" +
+      //"window.open()" + // Or try to open automatically
       "</script></html>";
     return this.newFixedLengthResponse(html);
   }
