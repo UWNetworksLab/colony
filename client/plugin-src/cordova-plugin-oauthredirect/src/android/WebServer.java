@@ -9,9 +9,15 @@ import android.util.Log;
 import fi.iki.elonen.NanoHTTPD;
 
 public class WebServer extends NanoHTTPD {
+  private String code;
 
   public WebServer(int port) throws IOException {
     super(port);
+    this.code = null;
+  }
+
+  public String getCode() {
+    return this.code;
   }
 
   @Override
@@ -35,6 +41,7 @@ public class WebServer extends NanoHTTPD {
     StringBuilder buf = new StringBuilder();
     for (Entry<String, String> kv: session.getParms().entrySet()) {
       if (kv.getKey().equals("code")) { // Digital Ocean
+        this.code = kv.getvalue();
         buf.append(kv.getValue());
       }
     }
