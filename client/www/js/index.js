@@ -1,5 +1,4 @@
 var app = {}
-app.PROBE_TIMEOUT = 1000;
 
 app.initialize = function() {
   // 'load', 'deviceready', 'offline', and 'online'.
@@ -28,19 +27,6 @@ app.setupOAuthListener = function() {
   }
 };
 
-app.codeProbe = function() {
-  window.oauth.getCode(function(err, code) {
-    if (err) {
-      console.log(err);
-      setTimeout(app.codeProbe, app.PROBE_TIMEOUT);    
-    } else {
-      console.log(code);
-      setTimeout(function() {
-        window.oauth.stopListening(function() {});
-      },1000);
       document.getElementById("title").appendChild(document.createTextNode(code))
-    }
-  });
-};
 
 app.initialize();
