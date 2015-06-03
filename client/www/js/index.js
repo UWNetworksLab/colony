@@ -1,4 +1,5 @@
 var app = {}
+app.PROBE_TIMEOUT = 1000;
 
 app.initialize = function() {
   // 'load', 'deviceready', 'offline', and 'online'.
@@ -20,10 +21,24 @@ app.setupOAuthListener = function() {
   var elts = document.getElementsByClassName("cloudlogo");
   for (var i = 0; i < elts.length; i++) {
     elts[i].addEventListener("click", function(e) {
-      console.log("click");
+      window.oauth.startListening(function() {});
+      app.codeProbe();
     });
 
   }
+};
+
+app.codeProbe = function() {
+  window.oauth.getCode(function(err, code) {
+    if (err) {
+      console.log(err);
+      setTimeout(app.codeProbe, app.PROBE_TIMEOUT);    
+    } else {
+      console.log(code);
+      window.oauth.stopListening(function() {});
+      document.getElementById("title").appendChild(document.createTextNode(code))
+    }
+  });
 };
 
 app.initialize();
