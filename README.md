@@ -8,11 +8,11 @@ and a variety of platforms.
 
 ## Dependencies
 Make sure you have the following installed and on your path
-Note: You will need to install the required android packages by running ```android```.
-You'll also need to either plug in an Android device or setup an emulator (```android avd```)
 - [Node.js](https://nodejs.org/)
 - [Android SDK](https://developer.android.com/sdk/installing/index.html)
 
+Note: You will need to install the required android packages by running ```android```.
+You'll also need to either plug in an Android device or setup an emulator (```android avd```)
 
 Then install the following from npm
 
