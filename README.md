@@ -1,3 +1,37 @@
-# colony
+# uProxy Colony
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/UWNetworksLab/colony)
+
+Colony is a mobile app that deploys a proxy/VPN server to a cloud provider
+and autoconfigures the mobile OS to use the proxy.
+Future features include the ability to share access to the proxy with friends,
+and a variety of platforms.
+
+## Dependencies
+Make sure you have the following installed and on your path
+Note: You will need to install the required android packages by running ```android```.
+You'll also need to either plug in an Android device or setup an emulator (```android avd```)
+- [Node.js](https://nodejs.org/)
+- [Android SDK](https://developer.android.com/sdk/installing/index.html)
+
+
+Then install the following from npm
+
+    npm install -g cordova
+    npm install -g gulp
+
+## Setup
+These commands only need to be run once
+
+    npm install
+    gulp setup
+
+If you mess up and want to wipe the cordova workspace:
+
+    gulp clean
+
+## Develop
+With the previous commands, you'll now have a cordova workspace at ```client/build/```
+When you change into this directory, you can run the following commands:
+- ```cordova build``` - Build the Android package
+- ```cordova emulate android``` - This will build and load the package into Android device/emulator
 
