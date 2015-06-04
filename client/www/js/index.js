@@ -35,8 +35,19 @@ app.setupOAuthListener = function() {
         "state=" + encodeURIComponent(obj.state);
       return window.oauth.launchAuthFlow(url, obj);
     }).then(function (responseUrl) {
-      console.log(responseUrl);
-      document.getElementById("title").appendChild(document.createTextNode(responseUrl));
+      var query = responseUrl.substr(responseUrl.indexOf('?') + 1),
+        param,
+        params = {},
+        keys = query.split('&'),
+        i = 0,
+        xhr = new XMLHttpRequest();
+
+      for (i = 0; i < keys.length; i += 1) {
+        param = keys[i].substr(0, keys[i].indexOf('='));
+        params[param] = keys[i].substr(keys[i].indexOf('=') + 1);
+      }
+
+      document.getElementById("title").appendChild(document.createTextNode(params["code"]));
     });
   };
   for (var i = 0; i < elts.length; i++) {
