@@ -10,9 +10,11 @@ import fi.iki.elonen.NanoHTTPD;
 
 public class WebServer extends NanoHTTPD {
   private String code;
+  private int port;
 
   public WebServer(int port) throws IOException {
     super(port);
+    this.port = port;
     this.code = null;
   }
 
@@ -32,16 +34,20 @@ public class WebServer extends NanoHTTPD {
     **/
 
     //session.getQueryParameterString();
-    StringBuilder buf = new StringBuilder();
-    for (Entry<String, String> kv: session.getParms().entrySet()) {
+    //for (Entry<String, String> kv: session.getParms().entrySet()) {
+    /**
+    for (Entry<String, String> kv: session.getHeaders().entrySet()) {
       if (kv.getKey().equals("code")) { // Digital Ocean
         this.code = kv.getValue();
-        buf.append(kv.getValue());
       }
     }
+    **/
+    this.code = "http://localhost:" + this.port +
+      session.getUri() + 
+      "?" + session.getQueryParameterString();
 
     String html = "<html><head><head><body>" + 
-      buf.toString() + 
+      this.getCode() + 
       "<br>" + 
       "<a href='INTENT_TO_APP'>Go Back</a>" +
       "</body><script>" +
