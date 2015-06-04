@@ -1,4 +1,4 @@
-# uProxy Colony
+# uProxy Colony / 天空之城
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/UWNetworksLab/colony)
 
 Colony is a mobile app that deploys a proxy/VPN server to a cloud provider
