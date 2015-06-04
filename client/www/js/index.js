@@ -1,4 +1,7 @@
 var app = {}
+app.REDIRECT_URIS = [
+  "http://localhost:10101"
+];
 
 app.initialize = function() {
   // 'load', 'deviceready', 'offline', and 'online'.
@@ -20,13 +23,20 @@ app.setupOAuthListener = function() {
   var elts = document.getElementsByClassName("cloudlogo");
   for (var i = 0; i < elts.length; i++) {
     elts[i].addEventListener("click", function(e) {
-      window.oauth.startListening(function() {});
-      app.codeProbe();
+      window.oauth.initiateOAuth(app.REDIRECT_URIS).then(function(obj) {
+        var url = "https://cloud.digitalocean.com/v1/oauth/authorize" +
+          "client_id=24cb4fd7317204781602be3b19cce72d9258bc59ba08a50b815f65adfc6ca534&" +
+          "response_type=code&" +
+          "redirect_uri=" + encodeURIComponent(obj.redirect) + "&" +
+          "state=" + encodeURIComponent(obj.state);
+        return window.oauth.launchAuthFlow(url, obj);
+      }).then(function (responseUrl) {
+        console.log(responseUrl);
+        document.getElementById("title").appendChild(document.createTextNode(responseUrl))
+      });
     });
-
   }
 };
 
-      document.getElementById("title").appendChild(document.createTextNode(code))
 
 app.initialize();
