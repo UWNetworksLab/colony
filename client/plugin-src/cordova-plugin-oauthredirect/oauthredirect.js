@@ -1,3 +1,5 @@
+/* globals cordova, window */
+
 window.oauth = {};
 window.oauth.REDIRECT_URI = "http://localhost:10101";
 window.oauth.REDIRECT_ID = "org.uproxy.colony";
@@ -8,6 +10,7 @@ window.oauth._state = null;
 window.oauth._isServerRunning = false;
 
 window.oauth._genericHandler = function(method, params, callback) {
+  "use strict";
   cordova.exec(function(ret) {
     callback(null, ret);
   }, function(err) {
@@ -16,10 +19,11 @@ window.oauth._genericHandler = function(method, params, callback) {
 };
 
 window.oauth._startStopServer = function() {
+  "use strict";
   if (window.oauth._state !== null && !window.oauth._isServerRunning) {
     window.oauth._startListening(function() {});
     window.oauth._isServerRunning = true;
-  } else if (window.oauth._state == null && window.oauth._isServerRunning) {
+  } else if (window.oauth._state === null && window.oauth._isServerRunning) {
     window.oauth._stopListening(function() {});
     window.oauth._isServerRunning = false;
   }
@@ -30,6 +34,7 @@ window.oauth._stopListening = window.oauth._genericHandler.bind({}, "stopListeni
 window.oauth._getCode = window.oauth._genericHandler.bind({}, "getCode", []);
 
 window.oauth._poll = function(reqObj) {
+  "use strict";
   window.oauth._getCode(function(reqObj, err, code) {
     if (err) {
       console.log(err);
@@ -56,13 +61,14 @@ window.oauth._poll = function(reqObj) {
 };
 
 window.oauth.initiateOAuth = function (registeredRedirectURIs) {
+  "use strict";
   if (registeredRedirectURIs.indexOf(window.oauth.REDIRECT_URI) > -1) {
-    return Promise.resolve({
+    return window.Promise.resolve({
       redirect: window.oauth.REDIRECT_URI,
-      state: window.oauth.REDIRECT_ID + Math.random();
+      state: window.oauth.REDIRECT_ID + Math.random()
     });
   } else {
-    return Promise.reject({
+    return window.Promise.reject({
       "errcode": "UNKNOWN",
       "message": "No requested redirects can be handled"
     });
@@ -70,21 +76,22 @@ window.oauth.initiateOAuth = function (registeredRedirectURIs) {
 };
 
 window.oauth.launchAuthFlow = function(url, reqObj) {
+  "use strict";
   if (window.oauth._state !== null) {
-    return Promise.reject({
+    return window.Promise.reject({
       "errcode": "UNKNOWN",
       "message": "Already called launchAuthFlow with this state"
     });
   }
   window.oauth._state = {
-    pollCount: 0
+    pollCount: 0,
     resolve: null,
     reject: null
   };
   window.oauth._startStopServer();
   window.oauth._poll(reqObj);
   window.open(url);  
-  return new Promise(function(resolve, reject) {
+  return new window.Promise(function(resolve, reject) {
     window.oauth._state.resolve = resolve;
     window.oauth._state.reject = reject;
   });

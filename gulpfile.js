@@ -46,7 +46,8 @@ gulp.task("lint", function() {
   "use strict";
   return gulp.src([
       "*.json",
-      "client/common/**/*.js",
+      "client/www/**/*.js",
+      "client/plugin-src/**/*.js",
     ]).pipe(jshint({ lookup: true }))
     .pipe(jshint.reporter("default"));
 });
