@@ -22,6 +22,10 @@ public class WebServer extends NanoHTTPD {
     return this.code;
   }
 
+  public void setCode(String c) {
+    this.code = c;
+  }
+
   @Override
   public Response serve(IHTTPSession session) {
     /**
@@ -42,17 +46,27 @@ public class WebServer extends NanoHTTPD {
       }
     }
     **/
-    this.code = "http://localhost:" + this.port +
-      session.getUri() + 
-      "?" + session.getQueryParameterString();
 
-    String html = "<html><head><head><body>" + 
-      this.getCode() + 
-      "<br>" + 
-      "<a href='INTENT_TO_APP'>Go Back</a>" +
-      "</body><script>" +
-      //"window.open()" + // Or try to open automatically
-      "</script></html>";
+    String redirectUrl;
+    String html = ""; 
+    if (session.getQueryParameterString().indexOf("code") > -1 &&
+        session.getQueryParameterString().indexOf("state") > -1) {
+      this.code = "http://localhost:" + this.port +
+        session.getUri() + 
+        "?" + session.getQueryParameterString();
+
+      redirectUrl = "app://org.uproxy.colony" + session.getUri() + "?" + session.getQueryParameterString();
+      html = "<html><head>" +
+        "<meta http-equiv='refresh' content='0;url=" + redirectUrl + "'>" + 
+        "</head><body>" + 
+        this.getCode() + 
+        "<br>" + 
+        "<a href='" + redirectUrl + "'>Go Back</a>" +
+        "</body><script>" +
+        "window.open('" + redirectUrl + "')" + // Or try to open automatically
+        "</script></html>";
+    } 
+
     return this.newFixedLengthResponse(html);
   }
 }

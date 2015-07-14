@@ -20,7 +20,17 @@ app.onDeviceReady = function() {
   receivedElement.setAttribute('style', 'display:block;');
   console.log('Received Event: deviceready');
 
-  app.setupOAuthListener();
+  window.oauth.getCode().then(function(code) {
+    app.onOAuthToken(code);
+  }).catch(function(err) {
+    app.setupOAuthListener();
+  });
+
+  // For debugging, an exit button
+  document.getElementById("exitbutton").addEventListener("click", function(evt) {
+    evt.preventDefault();
+    navigator.app.exitApp();
+  });
 };
 
 app.setupOAuthListener = function() {
@@ -35,26 +45,38 @@ app.setupOAuthListener = function() {
         "state=" + encodeURIComponent(obj.state) + "&" +
         "scope=read%20write";
       return window.oauth.launchAuthFlow(url, obj);
-    }).then(function (responseUrl) {
-      var query = responseUrl.substr(responseUrl.indexOf('?') + 1),
-        param,
-        params = {},
-        keys = query.split('&'),
-        i = 0,
-        xhr = new XMLHttpRequest();
-
-      for (i = 0; i < keys.length; i += 1) {
-        param = keys[i].substr(0, keys[i].indexOf('='));
-        params[param] = keys[i].substr(keys[i].indexOf('=') + 1);
-      }
-
-      document.getElementById("title").appendChild(document.createTextNode(params["token"]));
+    }).then(function(redirectUrl) {
+      console.log("Ignoring code: " + redirectUrl);
+      // app.onOAuthToken(redirectUrl);
+      // There's a new activity launched with the auth code.
+      console.log("Exiting");
+      navigator.app.exitApp();
+    }).catch(function(err) {
+      console.log("launchAuthFlow error: " + err);
+      // @todo handle error
     });
   };
   for (var i = 0; i < elts.length; i++) {
     elts[i].addEventListener("click", onclickHandler);
   }
 };
+
+app.onOAuthToken = function(responseUrl) {
+  console.log("Got token: " + responseUrl);
+  var query = responseUrl.substr(responseUrl.indexOf('?') + 1),
+    param,
+    params = {},
+    keys = query.split('&'),
+    i = 0;
+
+  for (i = 0; i < keys.length; i += 1) {
+    param = keys[i].substr(0, keys[i].indexOf('='));
+    params[param] = keys[i].substr(keys[i].indexOf('=') + 1);
+  }
+
+  document.getElementById("title").appendChild(document.createTextNode(params["token"]));
+};
+
 
 
 app.initialize();
