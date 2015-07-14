@@ -28,12 +28,13 @@
     "browser-request": "^0.3.3",
     "browserify": "^10.2.3",
     "cordova": "^5.0.0",
-    "digitalocean-api": "^0.1.1",
+    "do-wrapper": "^2.1.1",
     "fs-extra": "^0.18.4",
     "gulp": "^3.8.11",
     "gulp-jshint": "^1.11.0",
     "gulp-sequence": "^0.3.2",
     "pkgify": "^1.0.2",
+    "q": "^1.4.1",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   }

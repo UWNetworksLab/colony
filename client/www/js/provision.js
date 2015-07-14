@@ -1,9 +1,11 @@
 /*globals require*/
+var Q = require('q');
 
 /**
  * from a digital ocean networks descriptor object, return the
  * array of accessible IP addresses.
  */
+// TODO: Make async and query DO until we get an ip address
 function extractAddresses(networks) {
   'use strict';
   var addrs = [];
@@ -20,46 +22,59 @@ function extractAddresses(networks) {
 /**
  * wait for a DI event to complete
  */
-var EVENT_POLL_TIMER = 10;
-function waitForEvent(client, event, callback) {
+var EVENT_POLL_TIMER = 1;  // TODO: pick right value
+function waitForAction(client, dropletId, actionId) {
   'use strict';
-  client.eventGet(event, function (status) {
-    if (status === "completed") {
-      callback(true);
-    } else if (status === "errored") {
-      callback(false);
-    } else {
-      setTimeout(waitForEvent.bind({}, client, event, callback), EVENT_POLL_TIMER * 1000);
-    }
-  });
+  var deferred = Q.defer();
+  function _getAction() {
+    client.dropletsGetAction(dropletId, actionId, function (err, res, body) {
+      var status = body.action.status;
+      if (status === "completed") {
+        return deferred.resolve();
+      } else if (status === "errored") {
+        return deferred.reject();
+      } else {
+        setTimeout(_getAction, EVENT_POLL_TIMER * 1000);
+      }
+    });
+  }
+  _getAction();
+  return deferred.promise;
 }
 
 /**
  * Restart a droplet if it is not active.
  */
-function startServer(client, id, callback) {
+function startServer(client, dropletId) {
   'use strict';
-  client.dropletPowerCycle(id, function (err, event) {
+  var deferred = Q.defer();
+  client.dropletsRequestAction(dropletId, {"type": "power_on"}, function (err, res, body) {
     if (err) {
-      callback(err);
+      deferred.reject(err);
     } else {
-      waitForEvent(event, callback);
+      debugger;
+      waitForAction(client, dropletId, body.action.id).then(function() {
+        return deferred.resolve();
+      });
     }
   });
+  return deferred.promise;
 }
 
 /**
- * Given a clientID, apikey, target name, and ssh public key
+ * Given a clientID, accessToken, target name, and ssh public key
  * make sure there is a droplet with requested name that exists and is powered on.
  * returns the endpoint host & port for connections.
  */
-function provisionServer(clientID, apikey, name, sshkey) {
+module.exports = function provisionServer(accessToken, name, sshkey) {
   'use strict';
-  var Di = require('digitalocean-api'),
-    Q = require('q'),
-    client = new Di(clientID, apikey),
+  var DigitalOcean = require('do-wrapper'),
+    client = new DigitalOcean(accessToken, 25),
     deferred = Q.defer();
-  client.dropletGetAll(function (err, droplets) {
+
+  client.dropletsGetAll({}, function (err, res, body) {
+    // Check if there is an existing droplet with name, and start it
+    var droplets = body.droplets;
     if (err) {
       return deferred.reject(err);
     }
@@ -67,20 +82,31 @@ function provisionServer(clientID, apikey, name, sshkey) {
     for (i = 0; i < droplets.length; i += 1) {
       if (droplets[i].name === name) {
         if (droplets[i].status === "active") {
-          deferred.resolve(extractAddresses(droplets[i].networks));
+          return deferred.resolve(extractAddresses(droplets[i].networks));
         } else {
-          deferred.notify(0.5);
-          return startServer(client, droplets[i].id);
+          return startServer(client, droplets[i].id).then(function() {
+            deferred.resolve(extractAddresses(droplets[i].networks));
+          });
         }
       }
     }
 
-    var region = "nyc3", size = "512mb", image = "ubuntu-14-04-x64";
-    client.dropletNew(name, size, image, region, {}, function (err, droplet) {
-      deferred.notify(0.5);
-      // TODO: need to wait for event to complete.
-      deferred.resolve(extractAddresses(droplets.networks));
+    // Otherwise start a new droplet
+    var config = {
+      name: name,
+      region: "nyc3",
+      size: "512mb",
+      image: "ubuntu-14-04-x64"
+      // ssh_keys: [sshkey]
+    };
+    client.dropletsCreate(config, function (err, res, body) {
+      debugger;
+      var droplet = body.droplet;
+      waitForAction(client, droplet.id, body.links.actions[0].id).then(function() {
+        deferred.resolve(extractAddresses(droplet.networks));
+      });
     });
   });
+
   return deferred.promise;
 }
