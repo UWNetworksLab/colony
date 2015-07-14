@@ -48,7 +48,7 @@ app.setupOAuthListener = function() {
         params[param] = keys[i].substr(keys[i].indexOf('=') + 1);
       }
 
-      document.getElementById("title").appendChild(document.createTextNode(params["code"]));
+      document.getElementById("title").appendChild(document.createTextNode(params["token"]));
     });
   };
   for (var i = 0; i < elts.length; i++) {
