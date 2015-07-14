@@ -28,7 +28,7 @@ function queryIpAddress(client, dropletId) {
         setTimeout(_queryIpAddress, QUERY_IP_TIMER * 1000);
       } else {
         deferred.resolve(addrs);
-      }      
+      }
     });
   }
 
@@ -77,6 +77,35 @@ function startServer(client, dropletId) {
   return deferred.promise;
 }
 
+function addKey(client, keyName, sshKey) {
+  'use strict';
+  var deferred = Q.defer();
+  // Attempt to add a key
+  client.accountAddKey({name: keyName, public_key: sshKey},
+      function (err, res, body) {
+    if (err) {
+      return deferred.reject(err);
+    } else if (body.message == 'SSH Key is already in use on your account') {
+      // Account already has this key added, need to find it's ID.
+      client.accountGetKeys({}, function(err, res, body) {
+        if (err) {
+          return deferred.reject(err);
+        }
+        for (var i = 0; i < body.ssh_keys.length; ++i) {
+          if (body.ssh_keys[i].public_key == sshKey) {
+            return deferred.resolve(body.ssh_keys[i].id);
+          }
+        }
+        return deferred.reject('Error finding key id');
+      });
+    } else {
+      // Successfully added a new key, return it's ID.
+      return deferred.resolve(body.ssh_key.id);
+    }
+  });
+  return deferred.promise;
+}
+
 /**
  * Given a clientID, accessToken, target name, and ssh public key
  * make sure there is a droplet with requested name that exists and is powered on.
@@ -107,15 +136,7 @@ module.exports = function provisionServer(accessToken, name, sshKey) {
       }
     }
 
-    // Otherwise start a new droplet
-    // First register our public SSH key with this account
-    client.accountAddKey({
-      name: name + " Key",
-      public_key: sshKey
-    }, function (err, res, body) {
-      // TODO: Handle error case where key already exists
-      // Then create the droplet
-      var sshKeyId = body.ssh_key.id;
+    addKey(client, name + ' Key', sshKey).then(function(sshKeyId) {
       var config = {
         name: name,
         region: "nyc3",

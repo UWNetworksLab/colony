@@ -32,7 +32,8 @@ app.setupOAuthListener = function() {
         "client_id=24cb4fd7317204781602be3b19cce72d9258bc59ba08a50b815f65adfc6ca534&" +
         "response_type=token&" +
         "redirect_uri=" + encodeURIComponent(obj.redirect) + "&" +
-        "state=" + encodeURIComponent(obj.state);
+        "state=" + encodeURIComponent(obj.state) + "&" +
+        "scope=read%20write";
       return window.oauth.launchAuthFlow(url, obj);
     }).then(function (responseUrl) {
       var query = responseUrl.substr(responseUrl.indexOf('?') + 1),
