@@ -61,11 +61,6 @@ app.setupOAuthListener = function() {
   }
 };
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
 app.onOAuthToken = function(responseUrl) {
   console.log("Got token: " + responseUrl);
   var query = responseUrl.substr(responseUrl.indexOf('?') + 1),
@@ -79,18 +74,8 @@ app.onOAuthToken = function(responseUrl) {
     params[param] = keys[i].substr(keys[i].indexOf('=') + 1);
   }
 
-<<<<<<< Updated upstream
-  document.getElementById("title").appendChild(document.createTextNode(params["token"]));
-};
-
-
-=======
   var provisionServer = require('provision');
   document.getElementById("title").appendChild(document.createTextNode(params["access_token"]));
 };
-
-
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 
 app.initialize();
