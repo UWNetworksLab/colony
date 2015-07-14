@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 import android.util.Log;
+import android.content.Intent;
 
 /**
 * This class echoes a string called from JavaScript.
@@ -22,6 +23,15 @@ public class OAuthRedirect extends CordovaPlugin {
   protected void pluginInitialize() {
     try {
       server = new WebServer(PORT); // Digital ocean
+      Intent intent = this.cordova.getActivity().getIntent();
+      if (intent.getData() == null) {
+        //Log.e("helloworld", "null intent");
+      } else {
+        //this.cordova.getActivity().finish();
+        //Log.e("helloworld", intent.getData().toString());
+        server.setCode(intent.getData().toString());
+      }
+
     } catch(IOException e) {
       Log.e(this.getClass().getName(), e.getMessage());
     }
