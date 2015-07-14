@@ -40,13 +40,14 @@ app.setupOAuthListener = function() {
     window.oauth.initiateOAuth(app.REDIRECT_URIS).then(function(obj) {
       var url = "https://cloud.digitalocean.com/v1/oauth/authorize?" +
         "client_id=24cb4fd7317204781602be3b19cce72d9258bc59ba08a50b815f65adfc6ca534&" +
-        "response_type=code&" +
+        "response_type=token&" +
         "redirect_uri=" + encodeURIComponent(obj.redirect) + "&" +
-        "state=" + encodeURIComponent(obj.state);
+        "state=" + encodeURIComponent(obj.state) + "&" +
+        "scope=read%20write";
       return window.oauth.launchAuthFlow(url, obj);
     }).then(function(redirectUrl) {
       console.log("Ignoring code: " + redirectUrl);
-      // app.onOAuthToken(redirectUrl); 
+      // app.onOAuthToken(redirectUrl);
       // There's a new activity launched with the auth code.
       console.log("Exiting");
       navigator.app.exitApp();
@@ -73,7 +74,7 @@ app.onOAuthToken = function(responseUrl) {
     params[param] = keys[i].substr(keys[i].indexOf('=') + 1);
   }
 
-  document.getElementById("title").appendChild(document.createTextNode(params["code"]));
+  document.getElementById("title").appendChild(document.createTextNode(params["token"]));
 };
 
 

@@ -21,20 +21,21 @@ var pkgify = require("pkgify");
 var path = require("path");
 var spawn = require("child_process").spawn;
 
-gulp.task("build_digitalocean", function() {
+gulp.task("build_provision", function() {
   "use strict";
-  var entry = require.resolve("digitalocean-api");
+  var entry = path.join(__dirname, './client/www/js/provision.js');
   var filename = path.basename(entry);
   var bundle = function() {
     return browserify({
-      entries: [ entry ],
       debug: true
     }).transform(pkgify, {
       packages: {
         request: path.relative(__dirname, require.resolve("browser-request"))
       },
-      relativeTo: __dirname
-    }).bundle()
+      relativeTo: __dirname,
+      global: true
+    }).require(entry, {expose: 'provision'})
+      .bundle()
       .pipe(source(filename))
       .pipe(buffer())
       .pipe(gulp.dest("./client/www/build/"));
@@ -92,7 +93,7 @@ gulp.task("setup", gulpSequence(
   "cordova_build",
   "cordova_emulate"
 ));
-gulp.task("build", [ "build_digitalocean" ]);
+gulp.task("build", [ "build_provision" ]);
 gulp.task("clean", function(cb) { fs.remove("client/build", function() { cb(); }); });
 gulp.task("test", [ "lint" ]);
 gulp.task("default", [ "build", "test" ]);
