@@ -5,24 +5,41 @@ var Q = require('q');
  * from a digital ocean networks descriptor object, return the
  * array of accessible IP addresses.
  */
-// TODO: Make async and query DO until we get an ip address
-function extractAddresses(networks) {
+var QUERY_IP_TIMER = 1;  // TODO: Set a maximum timeout to reject promise?
+function queryIpAddress(client, dropletId) {
   'use strict';
-  var addrs = [];
-  Object.keys(networks).forEach(function (type) {
-    networks[type].forEach(function (address) {
-      if (address.type === "public" && address.ip_address) {
-        addrs.push(address.ip_address);
-      }
+  var deferred = Q.defer();
+
+  function _queryIpAddress() {
+    client.dropletsGetById(dropletId, function (err, res, body) {
+      // Extract IP addresses from the networks property
+      var networks = body.droplet.networks;
+      var addrs = [];
+      Object.keys(networks).forEach(function (type) {
+        networks[type].forEach(function (address) {
+          if (address.type === "public" && address.ip_address) {
+            addrs.push(address.ip_address);
+          }
+        });
+      });
+
+      // Retry after timeout if there are no IPs, otherwise fulfill with IP array
+      if (addrs.length === 0) {
+        setTimeout(_queryIpAddress, QUERY_IP_TIMER * 1000);
+      } else {
+        deferred.resolve(addrs);
+      }      
     });
-  });
-  return addrs;
+  }
+
+  _queryIpAddress();
+  return deferred.promise;
 }
 
 /**
- * wait for a DI event to complete
+ * Wait for a Digital Ocean action to complete
  */
-var EVENT_POLL_TIMER = 1;  // TODO: pick right value
+var EVENT_POLL_TIMER = 1;
 function waitForAction(client, dropletId, actionId) {
   'use strict';
   var deferred = Q.defer();
@@ -43,7 +60,7 @@ function waitForAction(client, dropletId, actionId) {
 }
 
 /**
- * Restart a droplet if it is not active.
+ * Turn on a droplet if it is not active.
  */
 function startServer(client, dropletId) {
   'use strict';
@@ -52,7 +69,6 @@ function startServer(client, dropletId) {
     if (err) {
       deferred.reject(err);
     } else {
-      debugger;
       waitForAction(client, dropletId, body.action.id).then(function() {
         return deferred.resolve();
       });
@@ -66,7 +82,7 @@ function startServer(client, dropletId) {
  * make sure there is a droplet with requested name that exists and is powered on.
  * returns the endpoint host & port for connections.
  */
-module.exports = function provisionServer(accessToken, name, sshkey) {
+module.exports = function provisionServer(accessToken, name, sshKey) {
   'use strict';
   var DigitalOcean = require('do-wrapper'),
     client = new DigitalOcean(accessToken, 25),
@@ -82,28 +98,36 @@ module.exports = function provisionServer(accessToken, name, sshkey) {
     for (i = 0; i < droplets.length; i += 1) {
       if (droplets[i].name === name) {
         if (droplets[i].status === "active") {
-          return deferred.resolve(extractAddresses(droplets[i].networks));
+          return deferred.resolve(queryIpAddress(client, droplets[i].id));
         } else {
           return startServer(client, droplets[i].id).then(function() {
-            deferred.resolve(extractAddresses(droplets[i].networks));
+            deferred.resolve(queryIpAddress(client, droplets[i].id));
           });
         }
       }
     }
 
     // Otherwise start a new droplet
-    var config = {
-      name: name,
-      region: "nyc3",
-      size: "512mb",
-      image: "ubuntu-14-04-x64"
-      // ssh_keys: [sshkey]
-    };
-    client.dropletsCreate(config, function (err, res, body) {
-      debugger;
-      var droplet = body.droplet;
-      waitForAction(client, droplet.id, body.links.actions[0].id).then(function() {
-        deferred.resolve(extractAddresses(droplet.networks));
+    // First register our public SSH key with this account
+    client.accountAddKey({
+      name: name + " Key",
+      public_key: sshKey
+    }, function (err, res, body) {
+      // TODO: Handle error case where key already exists
+      // Then create the droplet
+      var sshKeyId = body.ssh_key.id;
+      var config = {
+        name: name,
+        region: "nyc3",
+        size: "512mb",
+        image: "ubuntu-14-04-x64",
+        ssh_keys: [sshKeyId]
+      };
+      client.dropletsCreate(config, function (err, res, body) {
+        var droplet = body.droplet;
+        waitForAction(client, droplet.id, body.links.actions[0].id).then(function() {
+          deferred.resolve(queryIpAddress(client, droplet.id));
+        });
       });
     });
   });
