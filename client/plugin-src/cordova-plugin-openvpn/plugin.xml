@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="cordova-plugin-openvpn" version="1.0.0">
+  <name>OpenVPN</name>
+  <description>Captures an oAuth Token and redirects back to app</description>
+  <license>Apache 2.0</license>
+  <keywords>cordova,openvpn</keywords>
+
+  <engines>
+    <engine name="cordova-android" version=">=4.0.0-dev" />
+  </engines>
+
+  <platform name="android">
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="OpenVPN">
+        <param name="android-package" value="org.apache.cordova.openvpn.OpenVPN" />
+        <param name="onload" value="true" />
+      </feature>
+    </config-file>
+    <config-file target="AndroidManifest.xml" parent="application/activity">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" /> 
+        <data android:scheme="app" android:host="org.uproxy.colony" />
+      </intent-filter>
+    </config-file>
+
+    <source-file src="src/android/OpenVPN.java" target-dir="src/org/apache/cordova/openvpn" />
+
+    <js-module src="openvpn.js" name="openvpn">
+      <clobbers target="openvpn" />
+    </js-module>
+  </platform>
+</plugin>
