@@ -26,13 +26,7 @@ public class WebServer extends NanoHTTPD {
 
   @Override
   public Response serve(IHTTPSession session) {
-    String html;
-    if (session.getQueryParameterString().indexOf("token") > -1) {
-      this.code = "http://localhost:" + this.port + session.getUri() +
-                  "?" + session.getQueryParameterString();
-      html = "<html><body>Blank</body></html>";
-    } else {
-      html = "<html><head>" +
+    String html = "<html><head>" +
               // "<meta http-equiv='refresh' content='0;url=" + redirectUrl + "'>" + 
               "</head><body>" + 
               "<br>" + 
@@ -47,9 +41,17 @@ public class WebServer extends NanoHTTPD {
               "  xhr.send();" +
               "};" +
               "doRedirect();" +
-              "document.getElementById('redirectButton').addEventListener('click', doRedirect, false);" + 
+              "document.getElementById('redirectButton').setAttribute('href', 'app://org.uproxy.colony' + redirectUrl);" + 
               "</script></html>";
 
+    Log.e("hello", "!!!");
+    Log.e("hello", html);
+    Log.e("hello", session.getUri());
+    if (!(session.getQueryParameterString() == null) &&
+        session.getQueryParameterString().indexOf("token") > -1) {
+      this.code = "http://localhost:" + this.port + session.getUri() +
+                  "?" + session.getQueryParameterString();
+      Log.e("hello2", this.code);
     }
     return this.newFixedLengthResponse(html);
   }
