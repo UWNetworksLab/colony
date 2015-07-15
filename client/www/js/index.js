@@ -76,8 +76,13 @@ app.onOAuthToken = function(responseUrl) {
 
   document.getElementById("title").appendChild(document.createTextNode(params["access_token"]));
 
-  var provisionServer = require('provision');
-  provisionServer(params["access_token"], 'uProxyColony');
+  var DigitalOceanServer = require('provision');
+  var digitalOceanServer = new DigitalOceanServer();
+  // TODO: check return promise for IP address
+  digitalOceanServer.start(params["access_token"], 'uProxyColony');
+  digitalOceanServer.on('statusUpdate', function(update) {
+    console.log('got statusUpdate: ' + update);
+  });
 };
 
 app.initialize();
