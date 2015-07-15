@@ -106,18 +106,15 @@ function addKey(client, keyName, sshKey) {
   return deferred.promise;
 }
 
+/*
+ * Gets an SSH public/private key pair from localstorage or generate a new one
+ */
 function getKeyPair() {
-  var keypair = require('keypair');
-  var forge = require('node-forge');
-  var pair = keypair({bits: 1024});
-  var publicKey = forge.ssh.publicKeyToOpenSSH(pair.public, '');
-  var privateKey = forge.ssh.publicKeyToOpenSSH(pair.private, '');
+  var rsa = forge.pki.rsa;
+  var pair = rsa.generateKeyPair({bits: 1024, e: 0x10001});  // TODO: use async
+  var publicKey = forge.ssh.publicKeyToOpenSSH(pair.publicKey, 'info@uproxy.org');
+  var privateKey = forge.ssh.privateKeyToOpenSSH(pair.privateKey, '');
   return {public: publicKey, private: privateKey};
-  // publicKey = publicKey.substr('-----BEGIN RSA PUBLIC KEY----- '.length);
-  // publicKey = publicKey.substr(0, publicKey.length - ' -----END RSA PUBLIC KEY-----'.length - 1);
-  // privateKey = privateKey.substr('-----BEGIN RSA PRIVATE KEY----- '.length);
-  // privateKey = privateKey.substr(0, privateKey.length - ' -----END RSA PRIVATE KEY-----'.length - 1);
-  // return {public: 'ssh-rsa ' + publicKey, priviate: 'ssh-rsa ' + privateKey};
 }
 
 /**
@@ -150,9 +147,13 @@ module.exports = function provisionServer(accessToken, name) {
       }
     }
 
+    // Generate an SSH key pair
     var pair = getKeyPair();
     var sshKey = pair.public;
-    console.log('generated key: ' + sshKey);
+    localStorage.setItem("DigitalOcean-" + name + "-PublicKey", pair.public);
+    localStorage.setItem("DigitalOcean-" + name + "-PrivateKey", pair.private);  // TODO: Is this safe?
+
+    // Create a droplet with this SSH key as an authorized key
     addKey(client, name + ' Key', sshKey).then(function(sshKeyId) {
       var config = {
         name: name,
