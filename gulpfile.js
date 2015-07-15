@@ -82,6 +82,7 @@ gulp.task("cordova_create", function(cb) {
 });
 gulp.task("cordova_platform_android", cordovaTask.bind({}, [ "platform", "add", "android" ]));
 gulp.task("cordova_plugin_oauthredirect", cordovaTask.bind({}, [ "plugin", "add", "client/plugin-src/cordova-plugin-oauthredirect/", "--link", "--noregistry" ]));
+gulp.task("cordova_plugin_openvpn", cordovaTask.bind({}, [ "plugin", "add", "client/plugin-src/cordova-plugin-openvpn/", "--link", "--noregistry" ]));
 gulp.task("cordova_build", cordovaTask.bind({}, [ "build" ]));
 gulp.task("cordova_emulate", cordovaTask.bind({}, [ "emulate", "android" ]));
 gulp.task("setup_www", function(cb) {
@@ -94,6 +95,7 @@ gulp.task("setup", gulpSequence(
   "cordova_create",
   "cordova_platform_android",
   "cordova_plugin_oauthredirect",
+  "cordova_plugin_openvpn",
   "setup_www",
   "cordova_build",
   "cordova_emulate"
