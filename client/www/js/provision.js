@@ -106,12 +106,23 @@ function addKey(client, keyName, sshKey) {
   return deferred.promise;
 }
 
+/*
+ * Gets an SSH public/private key pair from localstorage or generate a new one
+ */
+function getKeyPair() {
+  var rsa = forge.pki.rsa;
+  var pair = rsa.generateKeyPair({bits: 1024, e: 0x10001});  // TODO: use async
+  var publicKey = forge.ssh.publicKeyToOpenSSH(pair.publicKey, 'info@uproxy.org');
+  var privateKey = forge.ssh.privateKeyToOpenSSH(pair.privateKey, '');
+  return {public: publicKey, private: privateKey};
+}
+
 /**
- * Given a clientID, accessToken, target name, and ssh public key
+ * Given an accessToken and name,
  * make sure there is a droplet with requested name that exists and is powered on.
  * returns the endpoint host & port for connections.
  */
-module.exports = function provisionServer(accessToken, name, sshKey) {
+module.exports = function provisionServer(accessToken, name) {
   'use strict';
   var DigitalOcean = require('do-wrapper'),
     client = new DigitalOcean(accessToken, 25),
@@ -136,6 +147,13 @@ module.exports = function provisionServer(accessToken, name, sshKey) {
       }
     }
 
+    // Generate an SSH key pair
+    var pair = getKeyPair();
+    var sshKey = pair.public;
+    localStorage.setItem("DigitalOcean-" + name + "-PublicKey", pair.public);
+    localStorage.setItem("DigitalOcean-" + name + "-PrivateKey", pair.private);  // TODO: Is this safe?
+
+    // Create a droplet with this SSH key as an authorized key
     addKey(client, name + ' Key', sshKey).then(function(sshKeyId) {
       var config = {
         name: name,

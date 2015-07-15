@@ -43,6 +43,11 @@ gulp.task("build_provision", function() {
   return bundle();
 });
 
+gulp.task('copy_forge_min', function(){
+  gulp.src('./node_modules/forge-min/forge.min.js')
+    .pipe(gulp.dest('./client/www/build/'));
+});
+
 gulp.task("lint", function() {
   "use strict";
   return gulp.src([
@@ -93,7 +98,7 @@ gulp.task("setup", gulpSequence(
   "cordova_build",
   "cordova_emulate"
 ));
-gulp.task("build", [ "build_provision" ]);
+gulp.task("build", [ "build_provision", "copy_forge_min"]);
 gulp.task("clean", function(cb) { fs.remove("client/build", function() { cb(); }); });
 gulp.task("test", [ "lint" ]);
 gulp.task("default", [ "build", "test" ]);

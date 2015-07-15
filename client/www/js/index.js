@@ -74,9 +74,10 @@ app.onOAuthToken = function(responseUrl) {
     params[param] = keys[i].substr(keys[i].indexOf('=') + 1);
   }
 
-  document.getElementById("title").appendChild(document.createTextNode(params["token"]));
+  document.getElementById("title").appendChild(document.createTextNode(params["access_token"]));
+
+  var provisionServer = require('provision');
+  provisionServer(params["access_token"], 'uProxyColony');
 };
-
-
 
 app.initialize();
