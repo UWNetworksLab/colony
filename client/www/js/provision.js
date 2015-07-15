@@ -117,18 +117,32 @@ function getKeyPair() {
   return {public: publicKey, private: privateKey};
 }
 
+// TODO: we should change the name of this file from provision to something like
+// digital-ocean-server.js
+function DigitalOceanServer() {
+};
+
 /**
  * Given an accessToken and name,
  * make sure there is a droplet with requested name that exists and is powered on.
  * returns the endpoint host & port for connections.
  */
-module.exports = function provisionServer(accessToken, name) {
+DigitalOceanServer.prototype.start = function(accessToken, name) {
   'use strict';
+
+  this.eventListeners = {
+    'statusUpdate': []
+  };
+
   var DigitalOcean = require('do-wrapper'),
     client = new DigitalOcean(accessToken, 25),
     deferred = Q.defer();
 
+  var emit = this.emit.bind(this);
+
   client.dropletsGetAll({}, function (err, res, body) {
+    emit('statusUpdate', 'Loaded droplets');
+
     // Check if there is an existing droplet with name, and start it
     var droplets = body.droplets;
     if (err) {
@@ -148,12 +162,14 @@ module.exports = function provisionServer(accessToken, name) {
     }
 
     // Generate an SSH key pair
+    emit('statusUpdate', 'Creating key');
     var pair = getKeyPair();
     var sshKey = pair.public;
     localStorage.setItem("DigitalOcean-" + name + "-PublicKey", pair.public);
     localStorage.setItem("DigitalOcean-" + name + "-PrivateKey", pair.private);  // TODO: Is this safe?
 
     // Create a droplet with this SSH key as an authorized key
+    emit('statusUpdate', 'Adding key');
     addKey(client, name + ' Key', sshKey).then(function(sshKeyId) {
       var config = {
         name: name,
@@ -162,10 +178,16 @@ module.exports = function provisionServer(accessToken, name) {
         image: "ubuntu-14-04-x64",
         ssh_keys: [sshKeyId]
       };
+      emit('statusUpdate', 'Creating droplet');
       client.dropletsCreate(config, function (err, res, body) {
         var droplet = body.droplet;
+        emit('statusUpdate', 'Waiting for droplet to create');
         waitForAction(client, droplet.id, body.links.actions[0].id).then(function() {
-          deferred.resolve(queryIpAddress(client, droplet.id));
+          emit('statusUpdate', 'Getting IP address');
+          queryIpAddress(client, droplet.id).then(function (ips) {
+            emit('statusUpdate', 'Got IP address: ' + ips[0]);
+            deferred.resolve(ips);
+          });
         });
       });
     });
@@ -173,3 +195,19 @@ module.exports = function provisionServer(accessToken, name) {
 
   return deferred.promise;
 }
+
+DigitalOceanServer.prototype.on = function(eventName, callback) {
+  if (this.eventListeners[eventName] === undefined) {
+    throw Error('unknown event ' + eventName);
+  }
+  this.eventListeners[eventName].push(callback);
+};
+
+DigitalOceanServer.prototype.emit = function(eventName, data) {
+  var callbacks = this.eventListeners[eventName];
+  for (var i = 0; i < callbacks.length; ++i) {
+    callbacks[i](data);
+  }
+};
+
+module.exports = DigitalOceanServer;
