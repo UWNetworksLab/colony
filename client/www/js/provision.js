@@ -106,12 +106,26 @@ function addKey(client, keyName, sshKey) {
   return deferred.promise;
 }
 
+function getKeyPair() {
+  var keypair = require('keypair');
+  var forge = require('node-forge');
+  var pair = keypair({bits: 1024});
+  var publicKey = forge.ssh.publicKeyToOpenSSH(pair.public, '');
+  var privateKey = forge.ssh.publicKeyToOpenSSH(pair.private, '');
+  return {public: publicKey, private: privateKey};
+  // publicKey = publicKey.substr('-----BEGIN RSA PUBLIC KEY----- '.length);
+  // publicKey = publicKey.substr(0, publicKey.length - ' -----END RSA PUBLIC KEY-----'.length - 1);
+  // privateKey = privateKey.substr('-----BEGIN RSA PRIVATE KEY----- '.length);
+  // privateKey = privateKey.substr(0, privateKey.length - ' -----END RSA PRIVATE KEY-----'.length - 1);
+  // return {public: 'ssh-rsa ' + publicKey, priviate: 'ssh-rsa ' + privateKey};
+}
+
 /**
- * Given a clientID, accessToken, target name, and ssh public key
+ * Given an accessToken and name,
  * make sure there is a droplet with requested name that exists and is powered on.
  * returns the endpoint host & port for connections.
  */
-module.exports = function provisionServer(accessToken, name, sshKey) {
+module.exports = function provisionServer(accessToken, name) {
   'use strict';
   var DigitalOcean = require('do-wrapper'),
     client = new DigitalOcean(accessToken, 25),
@@ -136,6 +150,9 @@ module.exports = function provisionServer(accessToken, name, sshKey) {
       }
     }
 
+    var pair = getKeyPair();
+    var sshKey = pair.public;
+    console.log('generated key: ' + sshKey);
     addKey(client, name + ' Key', sshKey).then(function(sshKeyId) {
       var config = {
         name: name,
