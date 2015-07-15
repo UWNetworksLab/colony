@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="cordova-plugin-ssh" version="1.0.0">
+  <name>ssh</name>
+  <description>Ssh client implementation</description>
+  <license>Apache 2.0</license>
+  <keywords>cordova,ssh</keywords>
+
+  <engines>
+    <engine name="cordova-android" version=">=4.0.0-dev" />
+  </engines>
+
+  <platform name="android">
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="Ssh">
+        <param name="android-package" value="org.apache.cordova.ssh.Ssh" />
+        <param name="onload" value="true" />
+      </feature>
+    </config-file>
+
+    <source-file src="src/android/Ssh.java" target-dir="src/org/apache/cordova/ssh" />
+    <source-file src="src/android/com/jcraft/jsch" target-dir="src/com/jcraft/jsch" />
+    <source-file src="src/android/com/jcraft/jzlib" target-dir="src/com/jcraft/jzlib" />
+
+    <js-module src="ssh.js" name="ssh">
+      <clobbers target="sshclobber" />
+    </js-module>
+  </platform>
+</plugin>

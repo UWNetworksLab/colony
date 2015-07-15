@@ -52,6 +52,7 @@ gulp.task("lint", function() {
   "use strict";
   return gulp.src([
       "*.json",
+      "*.js",
       "client/www/**/*.js",
       "client/plugin-src/**/*.js",
     ]).pipe(jshint({ lookup: true }))
@@ -78,10 +79,11 @@ gulp.task("cordova_create", function(cb) {
     require.resolve("cordova/bin/cordova"), 
     [ "create", "build", "org.uproxy.colony", "Colony" ], 
     { cwd: "client" }
-  ).on("close", function(code) { cb(); })
+  ).on("close", function(code) { cb(); });
 });
 gulp.task("cordova_platform_android", cordovaTask.bind({}, [ "platform", "add", "android" ]));
 gulp.task("cordova_plugin_oauthredirect", cordovaTask.bind({}, [ "plugin", "add", "client/plugin-src/cordova-plugin-oauthredirect/", "--link", "--noregistry" ]));
+gulp.task("cordova_plugin_ssh", cordovaTask.bind({}, [ "plugin", "add", "client/plugin-src/cordova-plugin-ssh/", "--link", "--noregistry" ]));
 gulp.task("cordova_build", cordovaTask.bind({}, [ "build" ]));
 gulp.task("cordova_emulate", cordovaTask.bind({}, [ "emulate", "android" ]));
 gulp.task("setup_www", function(cb) {
@@ -94,10 +96,19 @@ gulp.task("setup", gulpSequence(
   "cordova_create",
   "cordova_platform_android",
   "cordova_plugin_oauthredirect",
+  "cordova_plugin_ssh",
   "setup_www",
-  "cordova_build",
-  "cordova_emulate"
+  "cordova_build"
+  // "cordova_emulate"
 ));
+
+gulp.task("ssh", gulpSequence(
+  "cordova_create",
+  "cordova_platform_android",
+  "cordova_plugin_ssh",
+  "cordova_build"
+));
+
 gulp.task("build", [ "build_provision", "copy_forge_min"]);
 gulp.task("clean", function(cb) { fs.remove("client/build", function() { cb(); }); });
 gulp.task("test", [ "lint" ]);
