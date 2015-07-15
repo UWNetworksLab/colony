@@ -26,16 +26,31 @@ public class WebServer extends NanoHTTPD {
 
   @Override
   public Response serve(IHTTPSession session) {
-    String html = "<html><head>" +
-      // "<meta http-equiv='refresh' content='0;url=" + redirectUrl + "'>" + 
-      "</head><body>" + 
-      "<br>" + 
-      "<a id='redirectButton'>Return to Colony App</a>" +
-      "</body><script>" +
-      "var redirectUrl = 'app://org.uproxy.colony" + session.getUri() + "' + '?access_token=' + window.location.hash.match('access_token=(\\[^&]+)')[1];" + 
-      "console.log(redirectUrl);" + 
-      "document.getElementById('redirectButton').setAttribute('href', redirectUrl);" + 
-      "</script></html>";
+    String html;
+    if (session.getQueryParameterString().indexOf("token") > -1) {
+      this.code = "http://localhost:" + this.port + session.getUri() +
+                  "?" + session.getQueryParameterString();
+      html = "<html><body>Blank</body></html>";
+    } else {
+      html = "<html><head>" +
+              // "<meta http-equiv='refresh' content='0;url=" + redirectUrl + "'>" + 
+              "</head><body>" + 
+              "<br>" + 
+              "<a id='redirectButton'>Return to Colony App</a>" +
+              "</body><script>" +
+              "var redirectUrl = '" + session.getUri() + "' + '?access_token=' + window.location.hash.match('access_token=(\\[^&]+)')[1];" + 
+              "console.log(redirectUrl);" + 
+              "var doRedirect = function() {" +
+              "  var xhr = new XMLHttpRequest();" +
+              "  xhr.onload = function() { window.open('app://org.uproxy.colony' + redirectUrl); };" +
+              "  xhr.open('GET', redirectUrl);" +
+              "  xhr.send();" +
+              "};" +
+              "doRedirect();" +
+              "document.getElementById('redirectButton').addEventListener('click', doRedirect, false);" + 
+              "</script></html>";
+
+    }
     return this.newFixedLengthResponse(html);
   }
 }

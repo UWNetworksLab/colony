@@ -25,10 +25,10 @@ public class OAuthRedirect extends CordovaPlugin {
       server = new WebServer(PORT); // Digital ocean
       Intent intent = this.cordova.getActivity().getIntent();
       if (intent.getData() == null) {
-        //Log.e("helloworld", "null intent");
+        //Log.e("hello", "null intent");
       } else {
         //this.cordova.getActivity().finish();
-        //Log.e("helloworld", intent.getData().toString());
+        //Log.e("hello", intent.getData().toString());
         server.setCode(intent.getData().toString());
       }
 
