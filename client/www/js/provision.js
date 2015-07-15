@@ -184,7 +184,10 @@ DigitalOceanServer.prototype.start = function(accessToken, name) {
         emit('statusUpdate', 'Waiting for droplet to create');
         waitForAction(client, droplet.id, body.links.actions[0].id).then(function() {
           emit('statusUpdate', 'Getting IP address');
-          deferred.resolve(queryIpAddress(client, droplet.id));
+          queryIpAddress(client, droplet.id).then(function (ips) {
+            emit('statusUpdate', 'Got IP address: ' + ips[0]);
+            deferred.resolve(ips);
+          });
         });
       });
     });

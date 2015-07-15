@@ -62,6 +62,12 @@ app.setupOAuthListener = function() {
 };
 
 app.onOAuthToken = function(responseUrl) {
+  // Hide all old UI elements
+  document.getElementById('title').style.display = 'none';
+  document.getElementById('awsLogo').style.display = 'none';
+  document.getElementById('deviceready').style.display = 'none';
+  document.getElementById('exitbutton').style.display = 'none';
+
   console.log("Got token: " + responseUrl);
   var query = responseUrl.substr(responseUrl.indexOf('?') + 1),
     param,
@@ -74,14 +80,15 @@ app.onOAuthToken = function(responseUrl) {
     params[param] = keys[i].substr(keys[i].indexOf('=') + 1);
   }
 
-  document.getElementById("title").appendChild(document.createTextNode(params["access_token"]));
-
   var DigitalOceanServer = require('provision');
   var digitalOceanServer = new DigitalOceanServer();
+
   // TODO: check return promise for IP address
+  document.getElementById("status").innerText = 'Got access token: ' + params["access_token"];
   digitalOceanServer.start(params["access_token"], 'uProxyColony');
   digitalOceanServer.on('statusUpdate', function(update) {
     console.log('got statusUpdate: ' + update);
+    document.getElementById("status").innerText = update;
   });
 };
 
