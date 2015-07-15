@@ -36,7 +36,7 @@ public class WebServer extends NanoHTTPD {
               "console.log(redirectUrl);" + 
               "var doRedirect = function() {" +
               "  var xhr = new XMLHttpRequest();" +
-              "  xhr.onload = function() { window.open('app://org.uproxy.colony' + redirectUrl); };" +
+              "  xhr.onload = function() { window.location.href = 'app://org.uproxy.colony' + redirectUrl; };" +
               "  xhr.open('GET', redirectUrl);" +
               "  xhr.send();" +
               "};" +
