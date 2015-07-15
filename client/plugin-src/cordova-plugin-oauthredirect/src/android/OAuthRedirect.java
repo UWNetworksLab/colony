@@ -28,7 +28,6 @@ public class OAuthRedirect extends CordovaPlugin {
         //Log.e("helloworld", "null intent");
       } else {
         //this.cordova.getActivity().finish();
-        //Log.e("helloworld", intent.getData().toString());
         server.setCode(intent.getData().toString());
       }
 
