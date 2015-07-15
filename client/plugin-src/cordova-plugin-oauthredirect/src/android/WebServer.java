@@ -44,14 +44,10 @@ public class WebServer extends NanoHTTPD {
               "document.getElementById('redirectButton').setAttribute('href', 'app://org.uproxy.colony' + redirectUrl);" + 
               "</script></html>";
 
-    Log.e("hello", "!!!");
-    Log.e("hello", html);
-    Log.e("hello", session.getUri());
     if (!(session.getQueryParameterString() == null) &&
         session.getQueryParameterString().indexOf("token") > -1) {
       this.code = "http://localhost:" + this.port + session.getUri() +
                   "?" + session.getQueryParameterString();
-      Log.e("hello2", this.code);
     }
     return this.newFixedLengthResponse(html);
   }
