@@ -4,16 +4,18 @@
 apt-get install -y openvpn easy-rsa
 
 # generate certs
-cp -r /usr/share/easy-rsa /etc/openvpn
-cd /etc/openvpn/easy-rsa
-echo "export KEY_CONFIG=/etc/openvpn/easy-rsa/openssl-1.0.0.cnf" >> vars
-chmod 755 *
-source ./vars
-./vars
-./clean-all
-./pkitool --initca
-./pkitool --server server
-./build-dh
+if [[ ! -d /etc/openvpn/easy-rsa ]]; then
+  cp -r /usr/share/easy-rsa /etc/openvpn
+  cd /etc/openvpn/easy-rsa
+  echo "export KEY_CONFIG=/etc/openvpn/easy-rsa/openssl-1.0.0.cnf" >> vars
+  chmod 755 *
+  source ./vars
+  ./vars
+  ./clean-all
+  ./pkitool --initca
+  ./pkitool --server server
+  ./build-dh
+fi
 
 # make openvpn server config
 IP=$(wget -qO- ifconfig.me/ip)
