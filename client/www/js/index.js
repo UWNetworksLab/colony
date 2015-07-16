@@ -82,13 +82,29 @@ app.onOAuthToken = function(responseUrl) {
 
   var DigitalOceanServer = require('provision');
   var digitalOceanServer = new DigitalOceanServer();
+  var serverName = 'uProxyColony';
 
-  // TODO: check return promise for IP address
-  document.getElementById("status").innerText = 'Got access token: ' + params["access_token"];
-  digitalOceanServer.start(params["access_token"], 'uProxyColony');
   digitalOceanServer.on('statusUpdate', function(update) {
     console.log('got statusUpdate: ' + update);
     document.getElementById("status").innerText = update;
+  });
+
+  document.getElementById("status").innerText = 'Got access token: ' + params["access_token"];
+  digitalOceanServer.start(params["access_token"], serverName).then(function (serverIps) {
+    console.log("serverIP is: " + serverIps[0]);
+    var privateKey = localStorage.getItem("DigitalOcean-" + serverName + "-PrivateKey");
+    console.log('privateKey is: ' + privateKey);
+    window.ssh.connectKey(serverIps[0], 22, 'root', privateKey).then(function (connection) {
+      console.log('connected', connection);
+      return connection.sendCommand('curl https://raw.githubusercontent.com/uProxy/colony/master/server/setup-openvpn.sh | bash');
+    }).then(function (result) {
+      console.log('result: ' + result);
+      return connection.sendCommand('cat /etc/openvpn/client.ovpn');
+    }).then(function (ovpnFile) {
+      console.log('ovpnFile: ' + ovpnFile);
+    }).catch(function (err) {
+      console.log(err);
+    });
   });
 };
 
