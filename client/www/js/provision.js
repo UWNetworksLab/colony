@@ -150,18 +150,21 @@ DigitalOceanServer.prototype.start = function(accessToken, name) {
     if (err) {
       return deferred.reject(err);
     }
-    var i;
-    for (i = 0; i < droplets.length; i += 1) {
+
+    function queryIPAndResolve(dropletId) {
+      queryIpAddress(client, dropletId).then(function (ips) {
+        emit('statusUpdate', 'Got IP address: ' + ips[0]);
+        deferred.resolve(ips);
+      }); 
+    }
+
+    for (var i = 0; i < droplets.length; i += 1) {
       if (droplets[i].name === name) {
         if (droplets[i].status === "active" || droplets[i].status === "in-progress") {
           return deferred.resolve(queryIpAddress(client, droplets[i].id));
         } else {
-          return startServer(client, droplets[i].id).then(function() {
-            queryIpAddress(client, droplets[i].id).then(function (ips) {
-              emit('statusUpdate', 'Got IP address: ' + ips[0]);
-              deferred.resolve(ips);
-            });
-          });
+          return startServer(client, droplets[i].id).
+              then(queryIPAndResolve.bind({}, droplets[i].id));
         }
       }
     }
