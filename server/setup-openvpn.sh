@@ -36,7 +36,7 @@ cp /etc/openvpn/easy-rsa/keys/server.crt /etc/openvpn
 cp /etc/openvpn/easy-rsa/keys/server.key /etc/openvpn
 
 # setup iptables
-sed -i 's/#net.ipv4.ip_forward = 0/net.ipv4.ip_forward = 1/g' /etc/sysctl.conf
+sed -i 's/#net.ipv4.ip_forward/net.ipv4.ip_forward/g' /etc/sysctl.conf
 sysctl -p
 
 iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -j SNAT --to $IP
