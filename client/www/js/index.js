@@ -61,7 +61,7 @@ app.setupOAuthListener = function() {
 app.onOAuthToken = function(responseUrl) {
   "use strict";
   // Hide all old UI elements
-  document.getElementById('deviceready').style.display = 'none';
+  //document.getElementById('deviceready').style.display = 'none';
   document.getElementById('starttext').style.display = 'none';
 
   console.log("Got token: " + responseUrl);
