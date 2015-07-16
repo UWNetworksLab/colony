@@ -151,7 +151,7 @@ DigitalOceanServer.prototype.start = function(accessToken, name) {
     var i;
     for (i = 0; i < droplets.length; i += 1) {
       if (droplets[i].name === name) {
-        if (droplets[i].status === "active" || droplets[i].status === "in_progress") {
+        if (droplets[i].status === "active" || droplets[i].status === "in-progress") {
           return deferred.resolve(queryIpAddress(client, droplets[i].id));
         } else {
           return startServer(client, droplets[i].id).then(function() {

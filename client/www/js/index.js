@@ -120,7 +120,6 @@ app.onOAuthToken = function(responseUrl) {
       }).then(function (vpnResult) {
         // This seems to never get called (see catch block)
         console.log('vpnResult: ', vpnResult);
-        document.getElementById("status").innerText
       }).catch(function (err) {
         console.log(err);
         // Reconnect if SSH failed (sometimes fails right after new droplet creation)
