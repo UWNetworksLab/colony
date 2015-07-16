@@ -120,6 +120,9 @@ function getKeyPair() {
 // TODO: we should change the name of this file from provision to something like
 // digital-ocean-server.js
 function DigitalOceanServer() {
+  this.eventListeners = {
+    'statusUpdate': []
+  };
 };
 
 /**
@@ -130,10 +133,6 @@ function DigitalOceanServer() {
 DigitalOceanServer.prototype.start = function(accessToken, name) {
   'use strict';
 
-  this.eventListeners = {
-    'statusUpdate': []
-  };
-
   var DigitalOcean = require('do-wrapper'),
     client = new DigitalOcean(accessToken, 25),
     deferred = Q.defer();
@@ -143,6 +142,7 @@ DigitalOceanServer.prototype.start = function(accessToken, name) {
   client.dropletsGetAll({}, function (err, res, body) {
     emit('statusUpdate', 'Loaded droplets');
 
+    // TODO: What if we don't have the keys here?
     // Check if there is an existing droplet with name, and start it
     var droplets = body.droplets;
     if (err) {
@@ -151,11 +151,14 @@ DigitalOceanServer.prototype.start = function(accessToken, name) {
     var i;
     for (i = 0; i < droplets.length; i += 1) {
       if (droplets[i].name === name) {
-        if (droplets[i].status === "active") {
+        if (droplets[i].status === "active" || droplets[i].status === "in-progress") {
           return deferred.resolve(queryIpAddress(client, droplets[i].id));
         } else {
           return startServer(client, droplets[i].id).then(function() {
-            deferred.resolve(queryIpAddress(client, droplets[i].id));
+            queryIpAddress(client, droplets[i].id).then(function (ips) {
+              emit('statusUpdate', 'Got IP address: ' + ips[0]);
+              deferred.resolve(ips);
+            });
           });
         }
       }
