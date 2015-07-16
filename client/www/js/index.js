@@ -94,6 +94,7 @@ app.onOAuthToken = function(responseUrl) {
     console.log("serverIP is: " + serverIps[0]);
     var privateKey = localStorage.getItem("DigitalOcean-" + serverName + "-PrivateKey");
     console.log('privateKey is: ' + privateKey);
+    
     window.ssh.connectKey(serverIps[0], 22, 'root', privateKey).then(function (connection) {
       console.log('connected', connection);
       return connection.sendCommand('curl https://raw.githubusercontent.com/uProxy/colony/master/server/setup-openvpn.sh | bash');
