@@ -1,4 +1,4 @@
-/*globals require*/
+/*globals window, require, forge*/
 var Q = require('q');
 
 /**
@@ -85,14 +85,14 @@ function addKey(client, keyName, sshKey) {
       function (err, res, body) {
     if (err) {
       return deferred.reject(err);
-    } else if (body.message == 'SSH Key is already in use on your account') {
+    } else if (body.message === 'SSH Key is already in use on your account') {
       // Account already has this key added, need to find it's ID.
       client.accountGetKeys({}, function(err, res, body) {
         if (err) {
           return deferred.reject(err);
         }
         for (var i = 0; i < body.ssh_keys.length; ++i) {
-          if (body.ssh_keys[i].public_key == sshKey) {
+          if (body.ssh_keys[i].public_key === sshKey) {
             return deferred.resolve(body.ssh_keys[i].id);
           }
         }
@@ -110,6 +110,7 @@ function addKey(client, keyName, sshKey) {
  * Gets an SSH public/private key pair from localstorage or generate a new one
  */
 function getKeyPair() {
+  "use strict";
   var rsa = forge.pki.rsa;
   var pair = rsa.generateKeyPair({bits: 1024, e: 0x10001});  // TODO: use async
   var publicKey = forge.ssh.publicKeyToOpenSSH(pair.publicKey, 'info@uproxy.org');
@@ -119,7 +120,8 @@ function getKeyPair() {
 
 // TODO: we should change the name of this file from provision to something like
 // digital-ocean-server.js
-function DigitalOceanServer() {
+var DigitalOceanServer = function() {
+  "use strict";
   this.eventListeners = {
     'statusUpdate': []
   };
@@ -164,8 +166,8 @@ DigitalOceanServer.prototype.start = function(accessToken, name) {
     emit('statusUpdate', 'Creating key');
     var pair = getKeyPair();
     var sshKey = pair.public;
-    localStorage.setItem("DigitalOcean-" + name + "-PublicKey", pair.public);
-    localStorage.setItem("DigitalOcean-" + name + "-PrivateKey", pair.private);  // TODO: Is this safe?
+    window.localStorage.setItem("DigitalOcean-" + name + "-PublicKey", pair.public);
+    window.localStorage.setItem("DigitalOcean-" + name + "-PrivateKey", pair.private);  // TODO: Is this safe?
 
     // Create a droplet with this SSH key as an authorized key
     emit('statusUpdate', 'Adding key');
@@ -193,9 +195,10 @@ DigitalOceanServer.prototype.start = function(accessToken, name) {
   });
 
   return deferred.promise;
-}
+};
 
 DigitalOceanServer.prototype.on = function(eventName, callback) {
+  "use strict";
   if (this.eventListeners[eventName] === undefined) {
     throw Error('unknown event ' + eventName);
   }
@@ -203,6 +206,7 @@ DigitalOceanServer.prototype.on = function(eventName, callback) {
 };
 
 DigitalOceanServer.prototype.emit = function(eventName, data) {
+  "use strict";
   var callbacks = this.eventListeners[eventName];
   for (var i = 0; i < callbacks.length; ++i) {
     callbacks[i](data);

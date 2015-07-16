@@ -29,7 +29,7 @@ app.onDeviceReady = function() {
   // For debugging, an exit button
   document.getElementById("exitbutton").addEventListener("click", function(evt) {
     evt.preventDefault();
-    navigator.app.exitApp();
+    window.navigator.app.exitApp();
   });
 };
 
@@ -50,7 +50,7 @@ app.setupOAuthListener = function() {
       // app.onOAuthToken(redirectUrl);
       // There's a new activity launched with the auth code.
       console.log("Exiting");
-      navigator.app.exitApp();
+      window.navigator.app.exitApp();
     }).catch(function(err) {
       console.log("launchAuthFlow error: " + err);
       // @todo handle error
@@ -62,6 +62,7 @@ app.setupOAuthListener = function() {
 };
 
 app.onOAuthToken = function(responseUrl) {
+  "use strict";
   // Hide all old UI elements
   document.getElementById('title').style.display = 'none';
   document.getElementById('awsLogo').style.display = 'none';
@@ -89,10 +90,10 @@ app.onOAuthToken = function(responseUrl) {
     document.getElementById("status").innerText = update;
   });
 
-  document.getElementById("status").innerText = 'Got access token: ' + params["access_token"];
-  digitalOceanServer.start(params["access_token"], serverName).then(function (serverIps) {
+  document.getElementById("status").innerText = 'Got access token: ' + params.access_token;
+  digitalOceanServer.start(params.access_token, serverName).then(function (serverIps) {
     console.log("serverIP is: " + serverIps[0]);
-    var privateKey = localStorage.getItem("DigitalOcean-" + serverName + "-PrivateKey");
+    var privateKey = window.localStorage.getItem("DigitalOcean-" + serverName + "-PrivateKey");
     console.log('privateKey is: ' + privateKey);
     
     window.ssh.connectKey(serverIps[0], 22, 'root', privateKey).then(function (connection) {

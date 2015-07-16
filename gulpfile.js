@@ -44,6 +44,7 @@ gulp.task("build_provision", function() {
 });
 
 gulp.task('copy_forge_min', function(){
+  "use strict";
   gulp.src('./node_modules/forge-min/forge.min.js')
     .pipe(gulp.dest('./client/www/build/'));
 });
@@ -55,11 +56,13 @@ gulp.task("lint", function() {
       "*.js",
       "client/www/**/*.js",
       "client/plugin-src/**/*.js",
+      "!client/www/build/**",
     ]).pipe(jshint({ lookup: true }))
     .pipe(jshint.reporter("default"));
 });
 
 var cordovaTask = function(args, cb) {
+  "use strict";
   var proc = spawn(require.resolve("cordova/bin/cordova"), args, {
     cwd: "client/build"
   });
@@ -75,6 +78,7 @@ var cordovaTask = function(args, cb) {
   });
 };
 gulp.task("cordova_create", function(cb) {
+  "use strict";
   spawn(
     require.resolve("cordova/bin/cordova"), 
     [ "create", "build", "org.uproxy.colony", "Colony" ], 
@@ -88,6 +92,7 @@ gulp.task("cordova_plugin_ssh", cordovaTask.bind({}, [ "plugin", "add", "client/
 gulp.task("cordova_build", cordovaTask.bind({}, [ "build" ]));
 gulp.task("cordova_emulate", cordovaTask.bind({}, [ "emulate", "android" ]));
 gulp.task("setup_www", function(cb) {
+  "use strict";
   fs.remove("client/build/www", function() {
     fs.symlink("../www", "client/build/www", cb); 
   });
@@ -100,10 +105,12 @@ gulp.task("setup", gulpSequence(
   "cordova_plugin_openvpn",
   "cordova_plugin_ssh",
   "setup_www",
+  "build_js",
   "cordova_build"
 ));
 
-gulp.task("build", [ "build_provision", "copy_forge_min"]);
-gulp.task("clean", function(cb) { fs.remove("client/build", function() { cb(); }); });
+gulp.task("build_js", [ "build_provision", "copy_forge_min" ]);
+gulp.task("run", gulpSequence("build_js", "cordova_emulate"));
+gulp.task("clean", function(cb) { "use strict"; fs.remove("client/build", function() { cb(); }); });
 gulp.task("test", [ "lint" ]);
-gulp.task("default", [ "build", "test" ]);
+gulp.task("default", [ "run", "test" ]);

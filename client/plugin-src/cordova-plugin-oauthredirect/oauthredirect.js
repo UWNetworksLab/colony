@@ -64,6 +64,7 @@ window.oauth._poll = function(reqObj, launchUrl) {
 };
 
 window.oauth.getCode = function() {
+  "use strict";
   return new window.Promise(function(resolve, reject) {
     window.oauth._getCode(function(resolve, reject, err, code) {
       if (err) { reject(err); } 
