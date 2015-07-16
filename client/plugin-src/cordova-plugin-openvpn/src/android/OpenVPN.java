@@ -71,7 +71,6 @@ public class OpenVPN extends CordovaPlugin {
       // interact with the service.  We are communicating with our
       // service through an IDL interface, so get a client-side
       // representation of that from the raw service object.
-      
       mService = IOpenVPNAPIService.Stub.asInterface(service);
        
       try {
@@ -83,7 +82,6 @@ public class OpenVPN extends CordovaPlugin {
           onActivityResult(ICS_OPENVPN_PERMISSION, Activity.RESULT_OK, null);
         }
       } catch (RemoteException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       }
     }
@@ -95,32 +93,17 @@ public class OpenVPN extends CordovaPlugin {
     }
   };
 
+  // @todo Not sure what any of this does. Need to check for codes from OpenVPN
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (resultCode == Activity.RESULT_OK) {
-      //mService.registerStatusCallback(IOpenVPNStatusCallback cb);
-      if(requestCode==START_PROFILE_EMBEDDED) {
-        //startEmbeddedProfile(false);
-      }
-      if(requestCode==START_PROFILE_BYUUID) {
-        try {
-          mService.startProfile(this.mStartUUID);
-        } catch (RemoteException e) {
-          e.printStackTrace();
-        }
-      }
       if (requestCode == ICS_OPENVPN_PERMISSION) {
         /**
-        listVPNs();
         try {
           mService.registerStatusCallback(mCallback);
         } catch (RemoteException e) {
           e.printStackTrace();
         }
         **/
-
-      }
-      if (requestCode == PROFILE_ADD_NEW) {
-        //startEmbeddedProfile(true);
       }
     }
   };
@@ -134,30 +117,18 @@ public class OpenVPN extends CordovaPlugin {
   }
 
   private void listProfiles(CallbackContext callbackContext) {
-
     try {
       List<APIVpnProfile> list = mService.getProfiles();
       String all="List:";
       for(APIVpnProfile vp : list.subList(0, Math.min(5, list.size()))) {
         all = all + vp.mName + ":" + vp.mUUID + "\n";
+        //mStartUUID = list.get(0).mUUID;
       }
-
       if (list.size() > 5) {
         all +="\n And some profiles....";
       }
-
-      /**
-      if(list.size() > 0) {
-        Button b= mStartVpn;
-        b.setOnClickListener(this);
-        b.setVisibility(View.VISIBLE);
-        b.setText(list.get(0).mName);
-        mStartUUID = list.get(0).mUUID;
-      }
-      **/
       callbackContext.success(all);
     } catch (RemoteException e) {
-      // TODO Auto-generated catch block
       callbackContext.error(e.getMessage());
     }
   }
