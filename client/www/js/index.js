@@ -26,11 +26,6 @@ app.onDeviceReady = function() {
     app.setupOAuthListener();
   });
 
-  // For debugging, an exit button
-  document.getElementById("exitbutton").addEventListener("click", function(evt) {
-    evt.preventDefault();
-    window.navigator.app.exitApp();
-  });
 };
 
 app.setupOAuthListener = function() {
@@ -64,10 +59,7 @@ app.setupOAuthListener = function() {
 app.onOAuthToken = function(responseUrl) {
   "use strict";
   // Hide all old UI elements
-  document.getElementById('title').style.display = 'none';
-  document.getElementById('awsLogo').style.display = 'none';
   document.getElementById('deviceready').style.display = 'none';
-  document.getElementById('exitbutton').style.display = 'none';
 
   console.log("Got token: " + responseUrl);
   var query = responseUrl.substr(responseUrl.indexOf('?') + 1),
