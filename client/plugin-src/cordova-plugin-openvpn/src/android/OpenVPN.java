@@ -42,6 +42,7 @@ public class OpenVPN extends CordovaPlugin {
     Intent icsopenvpnService = new Intent(IOpenVPNAPIService.class.getName());
     icsopenvpnService.setPackage("de.blinkt.openvpn");
     this.cordova.getActivity().bindService(icsopenvpnService, mConnection, Context.BIND_AUTO_CREATE);
+
   }
 
   @Override
@@ -52,6 +53,9 @@ public class OpenVPN extends CordovaPlugin {
       return true;
     } else if (action.equals("listProfiles")) {
       this.listProfiles(callbackContext);
+    } else if (action.equals("startVPN")) {
+      String inlineConfig = args.getString(0);
+      this.startVPN(inlineConfig, callbackContext);
     }
     return false;
   }
@@ -93,6 +97,7 @@ public class OpenVPN extends CordovaPlugin {
 
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (resultCode == Activity.RESULT_OK) {
+      //mService.registerStatusCallback(IOpenVPNStatusCallback cb);
       if(requestCode==START_PROFILE_EMBEDDED) {
         //startEmbeddedProfile(false);
       }
@@ -128,7 +133,7 @@ public class OpenVPN extends CordovaPlugin {
     }
   }
 
-  protected void listProfiles(CallbackContext callbackContext) {
+  private void listProfiles(CallbackContext callbackContext) {
 
     try {
       List<APIVpnProfile> list = mService.getProfiles();
@@ -153,6 +158,14 @@ public class OpenVPN extends CordovaPlugin {
       callbackContext.success(all);
     } catch (RemoteException e) {
       // TODO Auto-generated catch block
+      callbackContext.error(e.getMessage());
+    }
+  }
+
+  private void startVPN(String inlineConfig, CallbackContext callbackContext) {
+    try {
+      mService.startVPN(inlineConfig);
+    } catch(RemoteException e) {
       callbackContext.error(e.getMessage());
     }
   }
