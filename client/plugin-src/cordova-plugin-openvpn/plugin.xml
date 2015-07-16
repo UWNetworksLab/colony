@@ -27,6 +27,7 @@
     </config-file>
 
     <source-file src="src/android/OpenVPN.java" target-dir="src/org/apache/cordova/openvpn" />
+    <source-file src="src/android/aidl/de" target-dir="src" />
 
     <js-module src="openvpn.js" name="openvpn">
       <clobbers target="openvpn" />

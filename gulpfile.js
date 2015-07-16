@@ -97,8 +97,7 @@ gulp.task("setup", gulpSequence(
   "cordova_plugin_oauthredirect",
   "cordova_plugin_openvpn",
   "setup_www",
-  "cordova_build",
-  "cordova_emulate"
+  "cordova_build"
 ));
 gulp.task("build", [ "build_provision", "copy_forge_min"]);
 gulp.task("clean", function(cb) { fs.remove("client/build", function() { cb(); }); });
