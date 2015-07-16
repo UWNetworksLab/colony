@@ -103,13 +103,6 @@ gulp.task("setup", gulpSequence(
   "cordova_build"
 ));
 
-gulp.task("ssh", gulpSequence(
-  "cordova_create",
-  "cordova_platform_android",
-  "cordova_plugin_ssh",
-  "cordova_build"
-));
-
 gulp.task("build", [ "build_provision", "copy_forge_min"]);
 gulp.task("clean", function(cb) { fs.remove("client/build", function() { cb(); }); });
 gulp.task("test", [ "lint" ]);
