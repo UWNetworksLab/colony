@@ -120,6 +120,9 @@ function getKeyPair() {
 // TODO: we should change the name of this file from provision to something like
 // digital-ocean-server.js
 function DigitalOceanServer() {
+  this.eventListeners = {
+    'statusUpdate': []
+  };
 };
 
 /**
@@ -129,10 +132,6 @@ function DigitalOceanServer() {
  */
 DigitalOceanServer.prototype.start = function(accessToken, name) {
   'use strict';
-
-  this.eventListeners = {
-    'statusUpdate': []
-  };
 
   var DigitalOcean = require('do-wrapper'),
     client = new DigitalOcean(accessToken, 25),
