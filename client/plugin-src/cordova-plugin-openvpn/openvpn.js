@@ -13,8 +13,3 @@ window.vpn._genericHandler = function(method, params) {
 window.vpn.listProfiles = window.vpn._genericHandler.bind({}, "listProfiles");
 window.vpn.startVPN = window.vpn._genericHandler.bind({}, "startVPN");
 
-/**
-window.echo("echome", function(echoValue) {
-  alert(echoValue == "echome"); // should alert true.
-});
-**/
