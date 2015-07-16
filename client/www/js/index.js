@@ -94,18 +94,48 @@ app.onOAuthToken = function(responseUrl) {
     console.log("serverIP is: " + serverIps[0]);
     var privateKey = localStorage.getItem("DigitalOcean-" + serverName + "-PrivateKey");
     console.log('privateKey is: ' + privateKey);
+
+    var connection;
+    function connectToSsh() {
+      console.log("Connecting to SSH...");
+      window.ssh.connectKey(serverIps[0], 22, 'root', privateKey).then(function (newConnection) {
+        connection = newConnection;
+        console.log('connection:', connection);
+        document.getElementById("status").innerText = 'Connected to SSH';
+        console.log('Running setup-openvpn.sh');
+        document.getElementById("status").innerText = 'Running setup-openvpn.sh';
+        return connection.sendCommand('curl https://raw.githubusercontent.com/uProxy/colony/master/server/setup-openvpn.sh | bash');
+      }).then(function (result) {
+        console.log('result:', result);
+        document.getElementById("status").innerText = 'Successfully ran setup-openvpn.sh';
+        console.log('Copying client.ovpn');
+        document.getElementById("status").innerText = 'Copying client.ovpn';
+        return connection.sendCommand('cat /etc/openvpn/client.ovpn');
+      }).then(function (ovpnFile) {
+        console.log('ovpnFile: ', ovpnFile);
+        document.getElementById("status").innerText = 'Successfully copied client.ovpn';
+        console.log('Starting VPN');
+        document.getElementById("status").innerText = 'Starting VPN';
+        return window.vpn.startVPN(ovpnFile.text);
+      }).then(function (vpnResult) {
+        // This seems to never get called (see catch block)
+        console.log('vpnResult: ', vpnResult);
+        document.getElementById("status").innerText
+      }).catch(function (err) {
+        console.log(err);
+        // Reconnect if SSH failed (sometimes fails right after new droplet creation)
+        if (err.indexOf('ECONNREFUSED') !== -1) {
+          setTimeout(connectToSsh, 10*1000);
+        // vpn.startVPN() will always reject with this error 
+        // TODO: Figure out what's going on here
+        } else if (err.indexOf('Invalid action') !== -1) {
+          console.log('Check VPN in notification bar');
+          document.getElementById("status").innerText = 'Check VPN in notification bar';
+        }
+      });
+    }
+    connectToSsh();
     
-    window.ssh.connectKey(serverIps[0], 22, 'root', privateKey).then(function (connection) {
-      console.log('connected', connection);
-      return connection.sendCommand('curl https://raw.githubusercontent.com/uProxy/colony/master/server/setup-openvpn.sh | bash');
-    }).then(function (result) {
-      console.log('result: ' + result);
-      return connection.sendCommand('cat /etc/openvpn/client.ovpn');
-    }).then(function (ovpnFile) {
-      console.log('ovpnFile: ' + ovpnFile);
-    }).catch(function (err) {
-      console.log(err);
-    });
   });
 };
 
