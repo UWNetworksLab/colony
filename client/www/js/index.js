@@ -13,12 +13,14 @@ app.initialize = function() {
 
 app.onDeviceReady = function() {
   "use strict";
+  /**
   var parentElement = document.getElementById('deviceready');
   var listeningElement = parentElement.querySelector('.listening');
   var receivedElement = parentElement.querySelector('.received');
   listeningElement.setAttribute('style', 'display:none;');
   receivedElement.setAttribute('style', 'display:block;');
   console.log('Received Event: deviceready');
+  **/
 
   window.oauth.getCode().then(function(code) {
     app.onOAuthToken(code);
@@ -60,6 +62,7 @@ app.onOAuthToken = function(responseUrl) {
   "use strict";
   // Hide all old UI elements
   document.getElementById('deviceready').style.display = 'none';
+  document.getElementById('starttext').style.display = 'none';
 
   console.log("Got token: " + responseUrl);
   var query = responseUrl.substr(responseUrl.indexOf('?') + 1),
