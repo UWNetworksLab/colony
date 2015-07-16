@@ -13,12 +13,14 @@ app.initialize = function() {
 
 app.onDeviceReady = function() {
   "use strict";
+  /**
   var parentElement = document.getElementById('deviceready');
   var listeningElement = parentElement.querySelector('.listening');
   var receivedElement = parentElement.querySelector('.received');
   listeningElement.setAttribute('style', 'display:none;');
   receivedElement.setAttribute('style', 'display:block;');
   console.log('Received Event: deviceready');
+  **/
 
   window.oauth.getCode().then(function(code) {
     app.onOAuthToken(code);
@@ -26,11 +28,6 @@ app.onDeviceReady = function() {
     app.setupOAuthListener();
   });
 
-  // For debugging, an exit button
-  document.getElementById("exitbutton").addEventListener("click", function(evt) {
-    evt.preventDefault();
-    navigator.app.exitApp();
-  });
 };
 
 app.setupOAuthListener = function() {
@@ -50,7 +47,7 @@ app.setupOAuthListener = function() {
       // app.onOAuthToken(redirectUrl);
       // There's a new activity launched with the auth code.
       console.log("Exiting");
-      navigator.app.exitApp();
+      window.navigator.app.exitApp();
     }).catch(function(err) {
       console.log("launchAuthFlow error: " + err);
       // @todo handle error
@@ -62,11 +59,10 @@ app.setupOAuthListener = function() {
 };
 
 app.onOAuthToken = function(responseUrl) {
+  "use strict";
   // Hide all old UI elements
-  document.getElementById('title').style.display = 'none';
-  document.getElementById('awsLogo').style.display = 'none';
-  document.getElementById('deviceready').style.display = 'none';
-  document.getElementById('exitbutton').style.display = 'none';
+  //document.getElementById('deviceready').style.display = 'none';
+  document.getElementById('starttext').style.display = 'none';
 
   console.log("Got token: " + responseUrl);
   var query = responseUrl.substr(responseUrl.indexOf('?') + 1),
@@ -89,10 +85,10 @@ app.onOAuthToken = function(responseUrl) {
     document.getElementById("status").innerText = update;
   });
 
-  document.getElementById("status").innerText = 'Got access token: ' + params["access_token"];
-  digitalOceanServer.start(params["access_token"], serverName).then(function (serverIps) {
+  document.getElementById("status").innerText = 'Got access token: ' + params.access_token;
+  digitalOceanServer.start(params.access_token, serverName).then(function (serverIps) {
     console.log("serverIP is: " + serverIps[0]);
-    var privateKey = localStorage.getItem("DigitalOcean-" + serverName + "-PrivateKey");
+    var privateKey = window.localStorage.getItem("DigitalOcean-" + serverName + "-PrivateKey");
     console.log('privateKey is: ' + privateKey);
 
     var connection;

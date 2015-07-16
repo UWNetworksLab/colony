@@ -30,8 +30,12 @@ If you mess up and want to wipe the cordova workspace:
     gulp clean
 
 ## Develop
+From the top-level directory, the default gulp task will lint, build, and run an emulator
+
+    gulp
+
 With the previous commands, you'll now have a cordova workspace at ```client/build/```
-When you change into this directory, you can run the following commands:
+When you change into this directory, you can directly run the following commands:
 - ```cordova build``` - Build the Android package
 - ```cordova emulate android``` - This will build and load the package into Android device/emulator
 
