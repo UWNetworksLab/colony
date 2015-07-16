@@ -1,6 +1,10 @@
 # adapted from: https://github.com/Nyr/openvpn-install/blob/master/openvpn-install.sh
 # Expecting to run in ubuntu 14.04
 
+if [ -f /etc/openvpn/client.ovpn ]; then
+  exit 0;
+fi
+
 apt-get install -y openvpn easy-rsa
 
 # generate certs
