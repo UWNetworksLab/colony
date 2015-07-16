@@ -17,14 +17,6 @@
         <param name="onload" value="true" />
       </feature>
     </config-file>
-    <config-file target="AndroidManifest.xml" parent="application/activity">
-      <intent-filter>
-        <action android:name="android.intent.action.VIEW" />
-        <category android:name="android.intent.category.DEFAULT" />
-        <category android:name="android.intent.category.BROWSABLE" /> 
-        <data android:scheme="app" android:host="org.uproxy.colony" />
-      </intent-filter>
-    </config-file>
 
     <source-file src="src/android/OpenVPN.java" target-dir="src/org/apache/cordova/openvpn" />
     <source-file src="src/android/aidl/de" target-dir="src" />

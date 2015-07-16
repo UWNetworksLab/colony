@@ -9,7 +9,7 @@ window.vpn._genericHandler = function(method, params, callback) {
     callback(null, ret);
   }, function(err) {
     callback(err);
-  }, "OAuthRedirect", method, params);
+  }, "OpenVPN", method, params);
 };
 
 

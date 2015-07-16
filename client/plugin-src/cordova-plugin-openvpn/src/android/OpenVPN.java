@@ -73,7 +73,7 @@ public class OpenVPN extends CordovaPlugin {
         if (i != null) {
           cordova.getActivity().startActivityForResult(i, ICS_OPENVPN_PERMISSION);
         } else {
-          onActivityResult(ICS_OPENVPN_PERMISSION, Activity.RESULT_OK,null);
+          onActivityResult(ICS_OPENVPN_PERMISSION, Activity.RESULT_OK, null);
         }
       } catch (RemoteException e) {
         // TODO Auto-generated catch block
