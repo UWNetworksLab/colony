@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.List;
 
 import android.util.Log;
 import android.app.Activity;
@@ -49,6 +50,8 @@ public class OpenVPN extends CordovaPlugin {
       String message = args.getString(0);
       this.echo(message, callbackContext);
       return true;
+    } else if (action.equals("listProfiles")) {
+      this.listProfiles(callbackContext);
     }
     return false;
   }
@@ -122,6 +125,35 @@ public class OpenVPN extends CordovaPlugin {
       callbackContext.success(message);
     } else {
       callbackContext.error("Expected one non-empty string argument.");
+    }
+  }
+
+  protected void listProfiles(CallbackContext callbackContext) {
+
+    try {
+      List<APIVpnProfile> list = mService.getProfiles();
+      String all="List:";
+      for(APIVpnProfile vp : list.subList(0, Math.min(5, list.size()))) {
+        all = all + vp.mName + ":" + vp.mUUID + "\n";
+      }
+
+      if (list.size() > 5) {
+        all +="\n And some profiles....";
+      }
+
+      /**
+      if(list.size() > 0) {
+        Button b= mStartVpn;
+        b.setOnClickListener(this);
+        b.setVisibility(View.VISIBLE);
+        b.setText(list.get(0).mName);
+        mStartUUID = list.get(0).mUUID;
+      }
+      **/
+      callbackContext.success(all);
+    } catch (RemoteException e) {
+      // TODO Auto-generated catch block
+      callbackContext.error(e.getMessage());
     }
   }
 

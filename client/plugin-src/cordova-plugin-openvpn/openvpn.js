@@ -12,6 +12,8 @@ window.vpn._genericHandler = function(method, params, callback) {
   }, "OpenVPN", method, params);
 };
 
+window.vpn.listProfiles = window.vpn._genericHandler.bind({}, "listProfiles", []);
+
 
 /**
 window.echo("echome", function(echoValue) {
