@@ -21,6 +21,7 @@ import android.os.RemoteException;
 
 import de.blinkt.openvpn.api.APIVpnProfile;
 import de.blinkt.openvpn.api.IOpenVPNAPIService;
+import de.blinkt.openvpn.api.IOpenVPNStatusCallback;
 
 
 /**
@@ -97,14 +98,28 @@ public class OpenVPN extends CordovaPlugin {
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (resultCode == Activity.RESULT_OK) {
       if (requestCode == ICS_OPENVPN_PERMISSION) {
-        /**
         try {
           mService.registerStatusCallback(mCallback);
         } catch (RemoteException e) {
           e.printStackTrace();
         }
-        **/
       }
+    }
+  };
+  
+  private IOpenVPNStatusCallback mCallback = new IOpenVPNStatusCallback.Stub() {
+    /**
+    * This is called by the remote service regularly to tell us about
+    * new values.  Note that IPC calls are dispatched through a thread
+    * pool running in each process, so the code executing here will
+    * NOT be running in our main thread like most other things -- so,
+    * to update the UI, we need to use a Handler to hop over there.
+    */
+
+    @Override
+    public void newStatus(String uuid, String state, String message, String level)
+                throws RemoteException {
+      //@todo handle these messages from OpenVPN
     }
   };
 
