@@ -1,19 +1,10 @@
 /* globals cordova, window */
 
 window.ssh = {};
-window.ssh._state = null;
 
 var sendCommand = function(method, params) {
   return new window.Promise(function(fulfill, reject) {
-    cordova.exec(function(ret) {
-      fulfill(ret);
-    }, function(err) {
-      if (!err instanceof Error) {
-        err = new Error(err);
-      }
-
-      reject(err);
-    }, 'Ssh', method, params);
+    cordova.exec(fulfill, reject, 'Ssh', method, params);
   });
 }
 

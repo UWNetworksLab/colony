@@ -106,40 +106,28 @@ public class Ssh extends CordovaPlugin {
     channel.setCommand(command);
 
     ByteArrayOutputStream output = new ByteArrayOutputStream();
-    InputStream in = channel.getInputStream();
+    channel.setOutputStream(output);
 
     channel.connect();
 
-    byte[] data = new byte[1024];
-    int len = 0;
-    while (!channel.isClosed() || in.available() > 0) {
-      if (in.available() > 0) {
-        if (len + in.available() > data.length) {
-          byte[] tmp = new byte[data.length * 2 + in.available()];
-          System.arraycopy(data, 0, tmp, 0, len);
-          data = tmp;
-        }
-        int read = in.read(data, len, data.length - len);
-        len += read;
-      } else {
-        try {
-          Thread.sleep(25);
-        } catch (Exception e) {
-          callbackContext.error(e.toString());
-          channel.disconnect();
-          return;
-        }
+    while (!channel.isClosed()) {
+      try {
+        Thread.sleep(25);
+      } catch (Exception e) {
+        callbackContext.error(e.toString());
+        channel.disconnect();
+        return;
       }
     }
 
-    channel.disconnect();
-
     JSONObject ret = new JSONObject();
 
-    ret.put("text", new String(data, 0, len));
+    ret.put("text", output.toString());
     ret.put("status", channel.getExitStatus());
 
     callbackContext.success(ret);
+
+    channel.disconnect();
   }
 
   private void disconnect(int idConnection, CallbackContext callbackContext) throws JSchException {
