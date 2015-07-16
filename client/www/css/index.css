@@ -110,5 +110,9 @@ h1 {
 }
 
 .cloudlogo {
-  width: 100px;
+  background: url("../img/island.png") no-repeat;
+  background-size: 100% auto;
+  padding-top: 40px;
+  width: 200px;
+  height: 150px;
 }
