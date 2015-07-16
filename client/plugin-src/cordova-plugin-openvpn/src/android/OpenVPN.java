@@ -24,9 +24,6 @@ import de.blinkt.openvpn.api.IOpenVPNAPIService;
 import de.blinkt.openvpn.api.IOpenVPNStatusCallback;
 
 
-/**
-* This class echoes a string called from JavaScript.
-*/
 public class OpenVPN extends CordovaPlugin {
   private static final int MSG_UPDATE_STATE = 0;
   private static final int MSG_UPDATE_MYIP = 1;
@@ -39,7 +36,6 @@ public class OpenVPN extends CordovaPlugin {
 
   @Override
   protected void pluginInitialize() {
-    //Intent intent = this.cordova.getActivity().getIntent();
     Intent icsopenvpnService = new Intent(IOpenVPNAPIService.class.getName());
     icsopenvpnService.setPackage("de.blinkt.openvpn");
     this.cordova.getActivity().bindService(icsopenvpnService, mConnection, Context.BIND_AUTO_CREATE);
@@ -48,11 +44,7 @@ public class OpenVPN extends CordovaPlugin {
 
   @Override
   public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-    if (action.equals("echo")) {
-      String message = args.getString(0);
-      this.echo(message, callbackContext);
-      return true;
-    } else if (action.equals("listProfiles")) {
+    if (action.equals("listProfiles")) {
       this.listProfiles(callbackContext);
     } else if (action.equals("startVPN")) {
       String inlineConfig = args.getString(0);
@@ -73,7 +65,7 @@ public class OpenVPN extends CordovaPlugin {
       // service through an IDL interface, so get a client-side
       // representation of that from the raw service object.
       mService = IOpenVPNAPIService.Stub.asInterface(service);
-       
+
       try {
         // Request permission to use the API
         Intent i = mService.prepare(cordova.getActivity().getPackageName());
@@ -86,7 +78,7 @@ public class OpenVPN extends CordovaPlugin {
         e.printStackTrace();
       }
     }
-     
+
     public void onServiceDisconnected(ComponentName className) {
       // This is called when the connection with the service has been
       // unexpectedly disconnected -- that is, its process crashed.
@@ -106,7 +98,7 @@ public class OpenVPN extends CordovaPlugin {
       }
     }
   };
-  
+
   private IOpenVPNStatusCallback mCallback = new IOpenVPNStatusCallback.Stub() {
     /**
     * This is called by the remote service regularly to tell us about
@@ -122,14 +114,6 @@ public class OpenVPN extends CordovaPlugin {
       //@todo handle these messages from OpenVPN
     }
   };
-
-  private void echo(String message, CallbackContext callbackContext) {
-    if (message != null && message.length() > 0) {
-      callbackContext.success(message);
-    } else {
-      callbackContext.error("Expected one non-empty string argument.");
-    }
-  }
 
   private void listProfiles(CallbackContext callbackContext) {
     try {

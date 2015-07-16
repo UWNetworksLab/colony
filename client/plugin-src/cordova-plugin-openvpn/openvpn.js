@@ -1,7 +1,6 @@
 /* globals cordova, window */
 
 window.vpn = {};
-window.vpn._state = null;
 
 window.vpn._genericHandler = function(method, params) {
   var args = Array.prototype.slice.call(arguments, 1);
