@@ -36,14 +36,21 @@ public class Ssh extends CordovaPlugin {
   @Override
   public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
     try {
-      if (action.equals("connect")) {
-
+      if (action.equals("connectPassword")) {
         String host = args.getString(0);
         int port = args.getInt(1);
         String username = args.getString(2);
         String password = args.getString(3);
 
         this.connect(host, port, username, password, callbackContext);
+        return true;
+      } else if (action.equals("connectKey")) {
+        String host = args.getString(0);
+        int port = args.getInt(1);
+        String username = args.getString(2);
+        String privateKey = args.getString(3);
+
+        this.connectKey(host, port, username, privateKey, callbackContext);
         return true;
       } else if (action.equals("sendCommand")) {
         int connectionId = args.getInt(0);
@@ -71,7 +78,9 @@ public class Ssh extends CordovaPlugin {
     Session session = jsch.getSession(username, host, port);
     sessions.add(session);
 
-    session.setPassword(password);
+    if (password != null) {
+      session.setPassword(password);
+    }
 
     // Avoid asking for key confirmation
     Properties prop = new Properties();
@@ -81,6 +90,14 @@ public class Ssh extends CordovaPlugin {
     session.connect();
 
     callbackContext.success(idConnection);
+  }
+
+  private void connectKey(String host, int port, String username, String privateKey, CallbackContext callbackContext) throws JSONException, JSchException {
+    // posts on StackOverflow indicate that this is needed
+    jsch.removeAllIdentity();
+    jsch.addIdentity("identity", privateKey.getBytes(), null, null);
+
+    this.connect(host, port, username, null, callbackContext);
   }
 
   private void sendCommand(int idConnection, String command, CallbackContext callbackContext) throws JSchException, IOException, JSONException {

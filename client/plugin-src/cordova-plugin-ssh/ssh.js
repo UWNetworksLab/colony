@@ -32,10 +32,18 @@ Connection.prototype.sendCommand = function(command) {
   return sendCommand('sendCommand', [this._id, command]);
 }
 
-window.ssh.connect = function(host, port, username, password) {
+window.ssh.connectPassword = function(host, port, username, password) {
   "use strict";
 
-  return sendCommand('connect', [host, port, username, password]).then(function(connectionId) {
+  return sendCommand('connectPassword', [host, port, username, password]).then(function(connectionId) {
+    return new Connection(connectionId);
+  });
+};
+
+window.ssh.connectKey = function(host, port, username, privateKey) {
+  "use strict";
+
+  return sendCommand('connectKey', [host, port, username, privateKey]).then(function(connectionId) {
     return new Connection(connectionId);
   });
 };
