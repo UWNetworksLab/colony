@@ -82,9 +82,11 @@ public class Ssh extends CordovaPlugin {
       session.setPassword(password);
     }
 
-    // Avoid asking for key confirmation
+    // Since we will not have the fingerprint of the server already saved and
+    // we do not have a good way to prompt the user, we need to disable strict
+    // key checking.  If the server changes, we will still get a failure.
     Properties prop = new Properties();
-    prop.put("StrictHostKeyChecking", "no"); //TODO this is bad
+    prop.put("StrictHostKeyChecking", "no");
     session.setConfig(prop);
 
     session.connect();
