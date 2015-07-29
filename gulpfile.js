@@ -71,11 +71,11 @@ gulp.task('build_chrome_app', ['build_provision', 'copy_forge_min'], function() 
   browserify('./client/chrome-app/index.js', {debug: true})
     .transform(pkgify, {
       packages: {
-        request: path.relative(__dirname, require.resolve("browser-request")),
-        'net': './client/chrome-app/lib/net.js',
-        'dns': './client/chrome-app/lib/dns.js',
-        'node-stringprep': './client/chrome-app/lib/stringprep.js',
-        'tls-connect': './client/chrome-app/lib/tlsconnect.js'
+        'request': path.relative(__dirname, require.resolve("browser-request")),
+        'net': path.relative(__dirname, './client/chrome-app/lib/net.js'),
+        'dns': path.relative(__dirname, './client/chrome-app/lib/dns.js'),
+        'node-stringprep': path.relative(__dirname, './client/chrome-app/lib/stringprep.js'),
+        'tls-connect': path.relative(__dirname, './client/chrome-app/lib/tlsconnect.js')
         // crypto: path.relative(__dirname, require.resolve("crypto-browserify"))
       },
       relativeTo: __dirname,
