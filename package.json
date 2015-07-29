@@ -22,14 +22,17 @@
   },
   "dependencies": {
     "http-proxy": "^1.11.1",
-    "socksv5": "0.0.6"
+    "socksv5": "0.0.6",
+    "ssh2": "^0.4.10"
   },
   "devDependencies": {
     "browser-request": "^0.3.3",
     "browserify": "^10.2.3",
     "cordova": "^5.0.0",
+    "crypto-browserify": "^3.9.14",
     "do-wrapper": "^2.1.1",
     "forge-min": "^0.6.20",
+    "freedom-for-node": "~0.2.12",
     "fs-extra": "^0.18.4",
     "gulp": "^3.8.11",
     "gulp-jshint": "^1.11.0",

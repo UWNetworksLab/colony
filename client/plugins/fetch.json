@@ -1,0 +1,34 @@
+{
+    "cordova-plugin-whitelist": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-whitelist@1"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-oauthredirect": {
+        "source": {
+            "type": "local",
+            "path": "../client/plugin-src/cordova-plugin-oauthredirect"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-openvpn": {
+        "source": {
+            "type": "local",
+            "path": "../client/plugin-src/cordova-plugin-openvpn"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-ssh": {
+        "source": {
+            "type": "local",
+            "path": "../client/plugin-src/cordova-plugin-ssh"
+        },
+        "is_top_level": true,
+        "variables": {}
+    }
+}

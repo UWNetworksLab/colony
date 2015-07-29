@@ -1,0 +1,57 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {
+            "res/xml/config.xml": {
+                "parents": {
+                    "/*": [
+                        {
+                            "xml": "<feature name=\"Whitelist\"><param name=\"android-package\" value=\"org.apache.cordova.whitelist.WhitelistPlugin\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"OAuthRedirect\"><param name=\"android-package\" value=\"org.apache.cordova.oauthredirect.OAuthRedirect\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"OpenVPN\"><param name=\"android-package\" value=\"org.apache.cordova.openvpn.OpenVPN\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Ssh\"><param name=\"android-package\" value=\"org.apache.cordova.ssh.Ssh\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "count": 1
+                        }
+                    ]
+                }
+            },
+            "AndroidManifest.xml": {
+                "parents": {
+                    "application/activity": [
+                        {
+                            "xml": "<intent-filter><action android:name=\"android.intent.action.VIEW\" /><category android:name=\"android.intent.category.DEFAULT\" /><category android:name=\"android.intent.category.BROWSABLE\" /><data android:host=\"org.uproxy.colony\" android:scheme=\"app\" /></intent-filter>",
+                            "count": 1
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "installed_plugins": {
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "org.uproxy.colony"
+        },
+        "cordova-plugin-oauthredirect": {
+            "PACKAGE_NAME": "org.uproxy.colony"
+        },
+        "cordova-plugin-openvpn": {
+            "PACKAGE_NAME": "org.uproxy.colony"
+        },
+        "cordova-plugin-ssh": {
+            "PACKAGE_NAME": "org.uproxy.colony"
+        }
+    },
+    "dependent_plugins": {}
+}

@@ -49,6 +49,43 @@ gulp.task('copy_forge_min', function(){
     .pipe(gulp.dest('./client/www/build/'));
 });
 
+gulp.task('build_chrome_app', ['build_provision', 'copy_forge_min'], function() {
+  'use strict';
+  // Copy all relevant files to client/build/chrome-app
+  gulp.src([
+    './client/chrome-app/background.js',
+    './client/chrome-app/index.html',
+    './client/chrome-app/manifest.json',
+    ]).pipe(gulp.dest('./client/build/chrome-app/'));
+  gulp.src([
+      './client/www/build/provision.js',
+      './client/www/build/forge.min.js',
+      './node_modules/freedom-for-chrome/freedom-for-chrome.js'
+    ]).pipe(gulp.dest('./client/build/chrome-app/js/'));
+  gulp.src('./client/www/css/index.css')
+    .pipe(gulp.dest('./client/build/chrome-app/css/'));
+  gulp.src('./client/www/img/*')
+    .pipe(gulp.dest('./client/build/chrome-app/img/'));
+
+  // Browserify client/chrome-app/index.js  
+  browserify('./client/chrome-app/index.js', {debug: true})
+    .transform(pkgify, {
+      packages: {
+        request: path.relative(__dirname, require.resolve("browser-request")),
+        'net': './client/chrome-app/lib/net.js',
+        'dns': './client/chrome-app/lib/dns.js',
+        'node-stringprep': './client/chrome-app/lib/stringprep.js',
+        'tls-connect': './client/chrome-app/lib/tlsconnect.js'
+        // crypto: path.relative(__dirname, require.resolve("crypto-browserify"))
+      },
+      relativeTo: __dirname,
+      global: true
+    })
+    .bundle()
+    .pipe(source('index-bundle.js'))
+    .pipe(gulp.dest('./client/build/chrome-app'));
+});
+
 gulp.task("lint", function() {
   "use strict";
   return gulp.src([
@@ -109,8 +146,12 @@ gulp.task("setup", gulpSequence(
   "cordova_build"
 ));
 
-gulp.task("build_js", [ "build_provision", "copy_forge_min" ]);
+gulp.task("build_js", [ "build_provision", "copy_forge_min", "build_chrome_app" ]);
 gulp.task("run", gulpSequence("build_js", "cordova_emulate"));
-gulp.task("clean", function(cb) { "use strict"; fs.remove("client/build", function() { cb(); }); });
+gulp.task("clean", function(cb) { 
+  "use strict"; 
+  fs.remove("client/www/build");
+  fs.remove("client/build", function() { cb(); });
+});
 gulp.task("test", [ "lint" ]);
 gulp.task("default", [ "run", "test" ]);
