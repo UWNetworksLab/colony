@@ -30,7 +30,7 @@ gulp.task("build_provision", function() {
       debug: true
     }).transform(pkgify, {
       packages: {
-        request: path.relative(__dirname, require.resolve("browser-request"))
+        // request: path.relative(__dirname, require.resolve("browser-request"))
       },
       relativeTo: __dirname,
       global: true
@@ -49,7 +49,7 @@ gulp.task('copy_forge_min', function(){
     .pipe(gulp.dest('./client/www/build/'));
 });
 
-gulp.task('build_chrome_app', ['build_provision', 'copy_forge_min'], function() {
+gulp.task('build_chrome_app', function() {
   'use strict';
   // Copy all relevant files to client/build/chrome-app
   gulp.src([
@@ -58,8 +58,7 @@ gulp.task('build_chrome_app', ['build_provision', 'copy_forge_min'], function() 
     './client/chrome-app/manifest.json',
     ]).pipe(gulp.dest('./client/build/chrome-app/'));
   gulp.src([
-      './client/www/build/provision.js',
-      './client/www/build/forge.min.js',
+      './node_modules/forge-min/forge.min.js',
       './node_modules/freedom-for-chrome/freedom-for-chrome.js'
     ]).pipe(gulp.dest('./client/build/chrome-app/js/'));
   gulp.src('./client/www/css/index.css')
@@ -74,9 +73,6 @@ gulp.task('build_chrome_app', ['build_provision', 'copy_forge_min'], function() 
         'request': path.relative(__dirname, require.resolve("browser-request")),
         'net': path.relative(__dirname, './client/chrome-app/lib/net.js'),
         'dns': path.relative(__dirname, './client/chrome-app/lib/dns.js'),
-        'node-stringprep': path.relative(__dirname, './client/chrome-app/lib/stringprep.js'),
-        'tls-connect': path.relative(__dirname, './client/chrome-app/lib/tlsconnect.js')
-        // crypto: path.relative(__dirname, require.resolve("crypto-browserify"))
       },
       relativeTo: __dirname,
       global: true
