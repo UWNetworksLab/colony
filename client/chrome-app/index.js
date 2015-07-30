@@ -1,4 +1,4 @@
-var ssh = require('ssh2').Client;
+var ssh = require('ssh2');
 
 // Does the OAuth login flow for DigitalOcean
 var digitalOceanOauth = function(e) {
@@ -42,13 +42,13 @@ var provisionDigitalOcean = function (accessToken) {
                              function (privateKey) {
       privateKey = privateKey["DigitalOcean-" + serverName + "-PrivateKey"];
       console.log('privateKey is: ', privateKey);
-      sshToServer(serverIp, 'root', privateKey);
+      sshToServer(serverIps[0], 'root', privateKey);
     });
   });
 }
 
 var sshToServer = function (serverIp, username, privateKey) {
-  var conn = new Client();
+  var conn = new ssh.Client();
   conn.on('ready', function() {
     console.log('Client :: ready');
     conn.exec('uptime', function(err, stream) {
