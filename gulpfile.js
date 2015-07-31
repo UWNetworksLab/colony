@@ -56,6 +56,8 @@ gulp.task('build_chrome_app', function() {
     './client/chrome-app/background.js',
     './client/chrome-app/index.html',
     './client/chrome-app/manifest.json',
+    './client/chrome-app/index.js',
+    './client/chrome-app/freedom-ssh.json',
     ]).pipe(gulp.dest('./client/build/chrome-app/'));
   gulp.src([
       './node_modules/forge-min/forge.min.js',
@@ -66,13 +68,27 @@ gulp.task('build_chrome_app', function() {
   gulp.src('./client/www/img/*')
     .pipe(gulp.dest('./client/build/chrome-app/img/'));
 
-  // Browserify client/chrome-app/index.js  
-  browserify('./client/chrome-app/index.js', {debug: true})
+  // Browserify client/chrome-app/freedom-ssh.js  
+  browserify('./client/chrome-app/freedom-ssh.js', {debug: true})
     .transform(pkgify, {
       packages: {
         'request': path.relative(__dirname, require.resolve("browser-request")),
         'net': path.relative(__dirname, './client/chrome-app/lib/net.js'),
         'dns': path.relative(__dirname, './client/chrome-app/lib/dns.js'),
+        'ssh2-streams': path.relative(__dirname, './client/chrome-app/lib/ssh2-streams'),
+      },
+      relativeTo: __dirname,
+      global: true
+    })
+    .bundle()
+    .pipe(source('freedom-ssh-bundle.js'))
+    .pipe(gulp.dest('./client/build/chrome-app'));
+
+  // Browserify client/chrome-app/index.js  
+  browserify('./client/chrome-app/index.js', {debug: true})
+    .transform(pkgify, {
+      packages: {
+        'request': path.relative(__dirname, require.resolve("browser-request"))
       },
       relativeTo: __dirname,
       global: true

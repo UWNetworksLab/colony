@@ -26,6 +26,7 @@
     "ssh2": "^0.4.10"
   },
   "devDependencies": {
+    "aliasify": "^1.7.2",
     "browser-request": "^0.3.3",
     "browserify": "^10.2.3",
     "cordova": "^5.0.0",
@@ -39,6 +40,7 @@
     "gulp-sequence": "^0.3.2",
     "pkgify": "^1.0.2",
     "q": "^1.4.1",
+    "socksv5": "0.0.6",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   }

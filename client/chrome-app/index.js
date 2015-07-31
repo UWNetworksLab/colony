@@ -1,7 +1,20 @@
-var ssh = require('ssh2');
+var ssh;
+
+var start = function (instance) {
+  var elts = document.getElementsByClassName('cloudlogo');
+  for (var i = 0; i < elts.length; i++) {
+    elts[i].addEventListener('click', digitalOceanOauth);
+  }
+
+  ssh = instance();
+  console.log('start() called. ssh ready.', ssh);
+  ssh.createClient().then(function (client) {
+    console.log(client);
+  });
+}
 
 // Does the OAuth login flow for DigitalOcean
-var digitalOceanOauth = function(e) {
+var digitalOceanOauth = function (e) {
   // Client ID and redirectUrl is set in kennysong's DO account
   var clientId = '3d5defc9d57ee3e752a97a3fe9fefbc9ded1d230443c02b7e5b99641d11f023d';
   var redirectUrl = encodeURIComponent(chrome.identity.getRedirectURL());
@@ -48,29 +61,39 @@ var provisionDigitalOcean = function (accessToken) {
 }
 
 var sshToServer = function (serverIp, username, privateKey) {
-  var conn = new ssh.Client();
-  conn.on('ready', function() {
-    console.log('Client :: ready');
-    conn.exec('uptime', function(err, stream) {
-      if (err) throw err;
-      stream.on('close', function(code, signal) {
-        console.log('Stream :: close :: code: ' + code + ', signal: ' + signal);
-        conn.end();
-      }).on('data', function(data) {
-        console.log('STDOUT: ' + data);
-      }).stderr.on('data', function(data) {
-        console.log('STDERR: ' + data);
-      });
-    });
-  }).connect({
-    host: serverIp,
-    port: 22,
-    username: username,
-    privateKey: privateKey 
+  ssh.connect(serverIp, username, privateKey).then(function (status) {
+    console.log(status);
   });
+  // ssh.getSsh().then(function (s) {
+  //   console.log(s);
+  //   var conn = new s.Client();     
+  //   console.log(conn);
+  // });
+
+  // var conn = ssh.createClient();
+  // conn.on('ready', function() {
+  //   console.log('Client :: ready');
+  //   conn.exec('uptime', function(err, stream) {
+  //     if (err) throw err;
+  //     stream.on('close', function(code, signal) {
+  //       console.log('Stream :: close :: code: ' + code + ', signal: ' + signal);
+  //       conn.end();
+  //     }).on('data', function(data) {
+  //       console.log('STDOUT: ' + data);
+  //     }).stderr.on('data', function(data) {
+  //       console.log('STDERR: ' + data);
+  //     });
+  //   });
+  // }).connect({
+  //   host: serverIp,
+  //   port: 22,
+  //   username: username,
+  //   privateKey: privateKey 
+  // });
 }
 
-var elts = document.getElementsByClassName('cloudlogo');
-for (var i = 0; i < elts.length; i++) {
-  elts[i].addEventListener('click', digitalOceanOauth);
-}
+window.onload = function (port) {
+  if (typeof freedom !== 'undefined') {
+    freedom('freedom-ssh.json').then(start);
+  }
+}.bind({}, self.port);
