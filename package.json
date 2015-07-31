@@ -42,6 +42,7 @@
     "socksv5": "0.0.6",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
-    "freedom-for-chrome": "~0.4.19"
+    "freedom-for-chrome": "~0.4.19",
+    "ssh2": "~0.4.10"
   }
 }
