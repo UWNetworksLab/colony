@@ -18,11 +18,6 @@
         "value": [],
         "ret": "object"
       },
-      "getSsh": {
-        "type": "method",
-        "value": [],
-        "ret": "object"
-      },
       "connect": {
         "type": "method",
         "value": ["string", "string", "string"],

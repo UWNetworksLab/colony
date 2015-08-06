@@ -5,16 +5,14 @@ var ssh = function (dispatchEvent) {
   this.dispatchEvent = dispatchEvent;
 };
 
+// Does not work – maybe a manifest issue?
 ssh.prototype.createClient = function () {
   return Promise.resolve(new ssh2.Client());
 };
 
-ssh.prototype.getSsh = function () {
-  return Promise.resolve(ssh2);
-}
-
 ssh.prototype.connect = function (serverIp, username, privateKey) {
   var conn = new ssh2.Client();
+  console.log('Conn:', conn);
   conn.on('ready', function() {
     console.log('Client :: ready');
     conn.exec('uptime', function(err, stream) {

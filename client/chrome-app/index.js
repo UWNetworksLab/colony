@@ -8,9 +8,6 @@ var start = function (instance) {
 
   ssh = instance();
   console.log('start() called. ssh ready.', ssh);
-  ssh.createClient().then(function (client) {
-    console.log(client);
-  });
 }
 
 // Does the OAuth login flow for DigitalOcean

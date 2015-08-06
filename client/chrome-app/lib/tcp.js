@@ -82,8 +82,9 @@ FreedomTCP.prototype._writeNative = function(req, data) {
 };
 
 FreedomTCP.prototype.writeBuffer = function(req, buf) {
-  var data = buf.toArrayBuffer();
-  this._writeNative(req, data);
+  // var data = buf.toArrayBuffer();
+  // this._writeNative(req, data);
+  this._writeNative(req, buf);
 };
 
 FreedomTCP.prototype.writeAsciiString = function(req, s) {
