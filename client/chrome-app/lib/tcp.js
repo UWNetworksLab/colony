@@ -1,8 +1,9 @@
 /*jshint node:true, strict:false*/
 /* global freedom */
 
-var FreedomTCP = function() {
-  this.fd = freedom['core.tcpsocket']();
+var FreedomTCP = function(fileDescriptor) {
+  this.fd = freedom['core.tcpsocket'](fileDescriptor);
+  this.fileDescriptor = fileDescriptor;
 
   // Strongly bind _onRead.
   this._onRead = this._onRead.bind(this);
@@ -10,6 +11,12 @@ var FreedomTCP = function() {
   this.fd.on('onDisconnect', function() {
     this.onread(-1);
   }.bind(this));
+
+  // TODO(kennysong)
+  var self = this;
+  this.fd.on('onConnection', function (info) {
+    self.onconnection(null, info.socket, info.host, info.port);
+  })
 
   this.bufferedReads = [];
   this.reading = true;
@@ -33,6 +40,8 @@ FreedomTCP.prototype._onRead = function(readInfo) {
 
 FreedomTCP.prototype.close = function(cb) {
   this.fd.off("onData", this._onRead);
+  this.fd.off("onDisconnect");
+  this.fd.off("onConnection");
   this.fd.close().then(cb);
   this.reading = false;
   this.writing = false;
@@ -136,6 +145,25 @@ FreedomTCP.prototype.writeUcs2String = function(req, s) {
 //FreedomTCP.prototype.open
 //FreedomTCP.prototype.bind
 //FreedomTCP.prototype.listen
+
+// FreedomTCP.prototype.bind = function (address, port) {
+//   this.fd.bind()
+// }
+// 
+
+FreedomTCP.prototype.listen = function (address, port) {
+  this.fd.listen(address, port).then(function () {
+    console.log('listening on port ' + port);
+  }, function (err) {
+    console.log('could not listen', err);
+  });
+}
+
+FreedomTCP.prototype.open = function (fd) {
+  if (fd !== this.fileDescriptor) {
+    console.warn('not supported');
+  }
+}
 
 FreedomTCP.prototype.connect = function(cb, address, port) {
   var self = this;

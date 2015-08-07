@@ -58,9 +58,10 @@ var provisionDigitalOcean = function (accessToken) {
 }
 
 var sshToServer = function (serverIp, username, privateKey) {
-  ssh.connect(serverIp, username, privateKey).then(function (status) {
-    console.log(status);
-  });
+  ssh.startSocksTunnel(serverIp, username, privateKey);
+
+  // ssh.connect(serverIp, username, privateKey);
+
   // ssh.getSsh().then(function (s) {
   //   console.log(s);
   //   var conn = new s.Client();     

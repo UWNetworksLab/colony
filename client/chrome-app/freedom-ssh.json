@@ -20,8 +20,11 @@
       },
       "connect": {
         "type": "method",
-        "value": ["string", "string", "string"],
-        "ret": "string"
+        "value": ["string", "string", "string"]
+      },
+      "startSocksTunnel": {
+        "type": "method",
+        "value": ["string", "string", "string"]
       }
     }
   },

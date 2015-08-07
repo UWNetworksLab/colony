@@ -69,6 +69,8 @@ gulp.task('build_chrome_app', function() {
     .pipe(gulp.dest('./client/build/chrome-app/img/'));
 
   // Browserify client/chrome-app/freedom-ssh.js  
+  // TODO(kennysong): Figure out how to only replace the relevant files with
+  // pkgify instead of copying the entire module
   browserify('./client/chrome-app/freedom-ssh.js', {debug: true})
     .transform(pkgify, {
       packages: {
@@ -76,6 +78,7 @@ gulp.task('build_chrome_app', function() {
         'net': path.relative(__dirname, './client/chrome-app/lib/net.js'),
         'dns': path.relative(__dirname, './client/chrome-app/lib/dns.js'),
         'ssh2-streams': path.relative(__dirname, './client/chrome-app/lib/ssh2-streams'),
+        'socksv5': path.relative(__dirname, './client/chrome-app/lib/socksv5'),
       },
       relativeTo: __dirname,
       global: true
