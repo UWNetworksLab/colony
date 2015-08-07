@@ -31,7 +31,6 @@ node_modules/
 !client/chrome-app/lib/ssh2-streams/node_modules/
 !client/chrome-app/lib/socksv5/node_modules/
 
-
 ### Cordova
 client/build/
 
