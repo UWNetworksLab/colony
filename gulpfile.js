@@ -49,7 +49,7 @@ gulp.task('copy_forge_min', function(){
     .pipe(gulp.dest('./client/www/build/'));
 });
 
-gulp.task('build_chrome_app', function() {
+gulp.task('copy_chrome_app', function () {
   'use strict';
   // Copy all relevant files to client/build/chrome-app
   gulp.src([
@@ -67,7 +67,9 @@ gulp.task('build_chrome_app', function() {
     .pipe(gulp.dest('./client/build/chrome-app/css/'));
   gulp.src('./client/www/img/*')
     .pipe(gulp.dest('./client/build/chrome-app/img/'));
+});
 
+gulp.task('browserify_chrome_app', function () {
   // Browserify client/chrome-app/freedom-ssh.js  
   // TODO(kennysong): Figure out how to only replace the relevant files with
   // pkgify instead of copying the entire module
@@ -100,6 +102,8 @@ gulp.task('build_chrome_app', function() {
     .pipe(source('index-bundle.js'))
     .pipe(gulp.dest('./client/build/chrome-app'));
 });
+
+gulp.task('build_chrome_app', ['copy_chrome_app', 'browserify_chrome_app']);
 
 gulp.task("lint", function() {
   "use strict";
