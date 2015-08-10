@@ -46,31 +46,33 @@ ssh.prototype.startSocksTunnel = function (serverIp, username, privateKey) {
 
   // Handler function when our SOCKS5 server receives a connection
   var onConnection = function (info, accept, deny) {
-    if (self.activeClient !== undefined) {
-      // Use existing SSH connection
-      console.log("Received request; reusing existing SSH connection...");
-      forwardThroughSsh(info, accept);
-    } else {
+    // if (self.activeClient !== undefined) {
+    //   // Use existing SSH connection
+    //   console.log("Received request; reusing existing SSH connection...");
+    //   forwardThroughSsh(info, accept, deny);
+    // } else {
+
       // Start new SSH connection and use that
       console.log("Received request; establishing SSH connection...");
       var conn = new ssh2.Client();
       self.activeClient = conn;
       conn.on('ready', function() {
         console.log("SSH connection established")
-        forwardThroughSsh(info, accept);
+        forwardThroughSsh(info, accept, deny);
       }).on('error', function(err) {
         deny();
       }).connect({
         host: serverIp,
         port: 22,
-        username: username,
-        privateKey: privateKey 
+        username: 'root',
+        privateKey: privateKey
       });
-    }
+      
+    // }
   }
 
   // Forwards a request through the currently active SSH tunnel
-  var forwardThroughSsh = function (info, accept) {
+  var forwardThroughSsh = function (info, accept, deny) {
     var conn = self.activeClient;
     conn.forwardOut(info.srcAddr, info.srcPort, info.dstAddr, info.dstPort,
                     function(err, stream) {

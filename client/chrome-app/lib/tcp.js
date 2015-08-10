@@ -147,6 +147,7 @@ FreedomTCP.prototype.writeUcs2String = function(req, s) {
 FreedomTCP.prototype.listen = function (address, port) {
   this.fd.listen(address, port).then(function () {
     console.log('Listening on port ' + port);
+    console.log('Try: curl --socks5 localhost:1080 http://ifconfig.co')
   }, function (err) {
     console.log('Could not listen', err);
   });
