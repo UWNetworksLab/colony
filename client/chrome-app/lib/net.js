@@ -19,6 +19,10 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+// This is a modified shim of net.js that adds the server functionality
+// needed for ./tcp.js, ssh2, and socksv5.
+// Original: https://github.com/freedomjs/freedom-social-xmpp/blob/master/lib/net.js
+
 var events = require('events');
 var stream = require('stream');
 var timers = require('timers');
@@ -43,18 +47,10 @@ function createTCP(fd) {
 }
 
 function createHandle(fd) {
-  // NOTE(kennysong): Review change
-  // var tty = process.binding('tty_wrap');
-  // var type = tty.guessHandleType(fd);
-  // if (type === 'PIPE') return createPipe();
-  // if (type === 'TCP') return createTCP();
-  // throw new TypeError('Unsupported fd type: ' + type);
   return createTCP(fd);
 }
 
-// NOTE(kennysong): debug change
 var debug = util.debuglog('net');
-// var debug = console.log;
 
 function isPipeName(s) {
   return util.isString(s) && toNumber(s) === false;
@@ -565,7 +561,7 @@ Socket.prototype._getpeername = function() {
 };
 
 
-// NOTE(kennysong): Changed so we can manually set Socket.remoteAddress/Port,
+// Modified so now we can manually set Socket.remoteAddress/Port,
 // hopefully without breaking any other functionality
 Socket.prototype.__defineGetter__('remoteAddress', function() {
   if (this.remoteAddressSettable !== undefined) {
@@ -1039,7 +1035,6 @@ var createServerHandle = exports._createServerHandle =
     if (addressType === 6) {
       err = handle.bind6(address, port);
     } else {
-      // NOTE(kennysong): Review change
       // err = handle.bind(address, port);
     }
   }
@@ -1077,11 +1072,6 @@ Server.prototype._listen2 = function(address, port, addressType, backlog, fd) {
   self._handle.onconnection = onconnection;
   self._handle.owner = self;
 
-  // NOTE(kennysong): review change
-  // Use a backlog of 512 entries. We pass 511 to the listen() call because
-  // the kernel does: backlogsize = roundup_pow_of_two(backlogsize + 1);
-  // which will thus give us a backlog of 512 entries.
-  // var err = self._handle.listen(backlog || 511);
   var err;
   self._handle.listen(address, port);
 
@@ -1105,39 +1095,7 @@ Server.prototype._listen2 = function(address, port, addressType, backlog, fd) {
 
 
 function listen(self, address, port, addressType, backlog, fd) {
-  // NOTE(kennysong): Review change
   self._listen2(address, port, addressType, backlog, fd);
-  // if (!cluster) cluster = require('cluster');
-
-  // if (cluster.isMaster) {
-  //   self._listen2(address, port, addressType, backlog, fd);
-  //   return;
-  // }
-
-  // cluster._getServer(self, address, port, addressType, fd, cb);
-
-  // function cb(err, handle) {
-  //   // EADDRINUSE may not be reported until we call listen(). To complicate
-  //   // matters, a failed bind() followed by listen() will implicitly bind to
-  //   // a random port. Ergo, check that the socket is bound to the expected
-  //   // port before calling listen().
-  //   //
-  //   // FIXME(bnoordhuis) Doesn't work for pipe handles, they don't have a
-  //   // getsockname() method. Non-issue for now, the cluster module doesn't
-  //   // really support pipes anyway.
-  //   if (err === 0 && port > 0 && handle.getsockname) {
-  //     var out = {};
-  //     err = handle.getsockname(out);
-  //     if (err === 0 && port !== out.port)
-  //       err = -4/*uv.UV_EADDRINUSE*/;
-  //   }
-
-  //   if (err)
-  //     return self.emit('error', errnoException(err, 'bind'));
-
-  //   self._handle = handle;
-  //   self._listen2(address, port, addressType, backlog, fd);
-  // }
 }
 
 
@@ -1155,8 +1113,6 @@ Server.prototype.listen = function() {
   // When the ip is omitted it can be the second argument.
   var backlog = toNumber(arguments[1]) || toNumber(arguments[2]);
 
-  // NOTE(kennysong): Need to review this change
-  // var TCP = process.binding('tcp_wrap').TCP;
   var TCP = createTCP();
 
   if (arguments.length == 0 || util.isFunction(arguments[0])) {
@@ -1215,7 +1171,6 @@ Server.prototype.address = function() {
   }
 };
 
-// NOTE(kennysong): Review change
 function onconnection(err, fileDescriptor, remoteAddress, remotePort) {
   var handle = this;
   var self = handle.owner;
@@ -1238,7 +1193,6 @@ function onconnection(err, fileDescriptor, remoteAddress, remotePort) {
   });
   socket.readable = socket.writable = true;
 
-  // NOTE(kennysong): Added new properties 
   socket.remoteAddressSettable = remoteAddress;
   socket.remotePortSettable = remotePort;
 

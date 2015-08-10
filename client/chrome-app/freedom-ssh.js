@@ -5,16 +5,15 @@ var ssh = function (dispatchEvent) {
   this.dispatchEvent = dispatchEvent;
 };
 
-// Does not work – maybe a manifest issue?
-ssh.prototype.createClient = function () {
-  return Promise.resolve(new ssh2.Client());
-};
+// The active SSH session
+ssh.prototype.activeClient = undefined;
 
+// Connects to a remote server via SSH and runs the "uptime" command
 ssh.prototype.connect = function (serverIp, username, privateKey) {
+  console.log("Creating SSH connection...");
   var conn = new ssh2.Client();
-  console.log('Conn:', conn);
   conn.on('ready', function() {
-    console.log('Client :: ready');
+    console.log('SSH tunnel is ready');
     conn.exec('uptime', function(err, stream) {
       if (err) throw err;
       stream.on('close', function(code, signal) {
@@ -35,40 +34,66 @@ ssh.prototype.connect = function (serverIp, username, privateKey) {
   });
 }
 
+// Start a SOCKS5 server and an SSH tunnel that forwards requests from
+// the server
 ssh.prototype.startSocksTunnel = function (serverIp, username, privateKey) {
-  socks.createServer(function(info, accept, deny) {
-    console.log('socksv5.Server connection listener called, info:', info);
-    var conn = new ssh2.Client();
-    console.log('SSH Conn:', conn);
-    conn.on('ready', function() {
-      console.log('Client :: ready');
-      conn.forwardOut(info.srcAddr, info.srcPort, info.dstAddr, info.dstPort,
-                      function(err, stream) {
-        if (err) {
-          conn.end();
-          return deny();
-        }
-
-        var clientSocket;
-        if (clientSocket = accept(true)) {
-          stream.pipe(clientSocket).pipe(stream).on('close', function() {
-            conn.end();
-          });
-        } else {
-          conn.end();
-        }
-      });
-    }).on('error', function(err) {
-      deny();
-    }).connect({
-      host: serverIp,
-      port: 22,
-      username: username,
-      privateKey: privateKey 
-    });
+  var self = this;
+  socks.createServer(function (info, accept, deny) {
+    onConnection(info, accept, deny);
   }).listen(1080, '0.0.0.0', 10, function() {
-    console.log('SOCKSv5 proxy server started on port 1080');
+    console.log('SOCKS5 proxy server started on port 1080');
   }).useAuth(socks.auth.None());
+
+  // Handler function when our SOCKS5 server receives a connection
+  var onConnection = function (info, accept, deny) {
+    if (self.activeClient !== undefined) {
+      // Use existing SSH connection
+      console.log("Received request; reusing existing SSH connection...");
+      forwardThroughSsh(info, accept);
+    } else {
+      // Start new SSH connection and use that
+      console.log("Received request; establishing SSH connection...");
+      var conn = new ssh2.Client();
+      self.activeClient = conn;
+      conn.on('ready', function() {
+        console.log("SSH connection established")
+        forwardThroughSsh(info, accept);
+      }).on('error', function(err) {
+        deny();
+      }).connect({
+        host: serverIp,
+        port: 22,
+        username: username,
+        privateKey: privateKey 
+      });
+    }
+  }
+
+  // Forwards a request through the currently active SSH tunnel
+  var forwardThroughSsh = function (info, accept) {
+    var conn = self.activeClient;
+    conn.forwardOut(info.srcAddr, info.srcPort, info.dstAddr, info.dstPort,
+                    function(err, stream) {
+      if (err) {
+        conn.end();
+        return deny();
+      }
+
+      var clientSocket;
+      if (clientSocket = accept(true)) {
+        stream.pipe(clientSocket).pipe(stream).on('close', function() {
+          conn.end();
+        });
+      } else {
+        conn.end();
+      }
+    });
+  };
+}
+
+// Closes the currently active SSH client
+ssh.prototype.closeSsh = function () {
+  this.activeClient.end();
 }
 
 if (typeof freedom !== 'undefined') {

@@ -1,4 +1,6 @@
 var ssh;
+var serverName = 'uProxyColony';
+var colonyStarted = false;
 
 var start = function (instance) {
   var elts = document.getElementsByClassName('cloudlogo');
@@ -12,6 +14,10 @@ var start = function (instance) {
 
 // Does the OAuth login flow for DigitalOcean
 var digitalOceanOauth = function (e) {
+  // Stop click handling after the button is pressed
+  if (colonyStarted) { return; }
+  else { colonyStarted = true; }
+
   // Client ID and redirectUrl is set in kennysong's DO account
   var clientId = '3d5defc9d57ee3e752a97a3fe9fefbc9ded1d230443c02b7e5b99641d11f023d';
   var redirectUrl = encodeURIComponent(chrome.identity.getRedirectURL());
@@ -39,55 +45,21 @@ var provisionDigitalOcean = function (accessToken) {
   // Create the server
   var DigitalOceanServer = require('../www/js/provision');
   var digitalOceanServer = new DigitalOceanServer();
-  var serverName = 'uProxyColony';
 
   digitalOceanServer.on('statusUpdate', function(update) {
-    console.log('got statusUpdate: ' + update);
+    console.log('Got provision.js statusUpdate: ' + update);
     document.getElementById("status").innerText = update;
   });
 
-  digitalOceanServer.start(accessToken, serverName).then(function (serverIps) {
-    console.log("serverIP is: " + serverIps[0]);
-    chrome.storage.local.get("DigitalOcean-" + serverName + "-PrivateKey", 
-                             function (privateKey) {
-      privateKey = privateKey["DigitalOcean-" + serverName + "-PrivateKey"];
-      console.log('privateKey is: ', privateKey);
-      sshToServer(serverIps[0], 'root', privateKey);
-    });
-  });
+  digitalOceanServer.start(accessToken, serverName).then(sshToServer);
 }
 
-var sshToServer = function (serverIp, username, privateKey) {
-  ssh.startSocksTunnel(serverIp, username, privateKey);
-
-  // ssh.connect(serverIp, username, privateKey);
-
-  // ssh.getSsh().then(function (s) {
-  //   console.log(s);
-  //   var conn = new s.Client();     
-  //   console.log(conn);
-  // });
-
-  // var conn = ssh.createClient();
-  // conn.on('ready', function() {
-  //   console.log('Client :: ready');
-  //   conn.exec('uptime', function(err, stream) {
-  //     if (err) throw err;
-  //     stream.on('close', function(code, signal) {
-  //       console.log('Stream :: close :: code: ' + code + ', signal: ' + signal);
-  //       conn.end();
-  //     }).on('data', function(data) {
-  //       console.log('STDOUT: ' + data);
-  //     }).stderr.on('data', function(data) {
-  //       console.log('STDERR: ' + data);
-  //     });
-  //   });
-  // }).connect({
-  //   host: serverIp,
-  //   port: 22,
-  //   username: username,
-  //   privateKey: privateKey 
-  // });
+var sshToServer = function (serverIps) {
+  chrome.storage.local.get("DigitalOcean-" + serverName + "-PrivateKey", 
+                           function (privateKey) {
+    privateKey = privateKey["DigitalOcean-" + serverName + "-PrivateKey"];
+    ssh.startSocksTunnel(serverIps[0], 'root', privateKey);
+  });
 }
 
 window.onload = function (port) {
@@ -95,3 +67,6 @@ window.onload = function (port) {
     freedom('freedom-ssh.json').then(start);
   }
 }.bind({}, self.port);
+
+// TODO(kennysong): Close SSH connection on window close, which is not trivial
+// in a Chrome app

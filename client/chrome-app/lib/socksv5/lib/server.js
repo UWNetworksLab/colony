@@ -35,7 +35,6 @@ function Server(options, listener) {
   EventEmitter.call(this);
 
   this._srv = new net.Server(function(socket) {
-    console.log('net.Server connection listener called, socket:', socket);
     if (self._connections >= self.maxConnections) {
       socket.destroy();
       return;

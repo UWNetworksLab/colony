@@ -1,6 +1,10 @@
 /*jshint node:true, strict:false*/
 /* global freedom */
 
+// This is a modified version of tcp.js that adds the server functionality
+// needed for ssh2 and socksv5.
+// Original: https://github.com/freedomjs/freedom-social-xmpp/blob/master/lib/tcp.js
+
 var FreedomTCP = function(fileDescriptor) {
   this.fd = freedom['core.tcpsocket'](fileDescriptor);
   this.fileDescriptor = fileDescriptor;
@@ -12,7 +16,6 @@ var FreedomTCP = function(fileDescriptor) {
     this.onread(-1);
   }.bind(this));
 
-  // TODO(kennysong)
   var self = this;
   this.fd.on('onConnection', function (info) {
     self.onconnection(null, info.socket, info.host, info.port);
@@ -141,27 +144,17 @@ FreedomTCP.prototype.writeUcs2String = function(req, s) {
 //TODO: support writing multiple chunks together
 //FreedomTCP.prototype.writev
 
-//TODO: Support server open/bind/listen.
-//FreedomTCP.prototype.open
-//FreedomTCP.prototype.bind
-//FreedomTCP.prototype.listen
-
-// FreedomTCP.prototype.bind = function (address, port) {
-//   this.fd.bind()
-// }
-// 
-
 FreedomTCP.prototype.listen = function (address, port) {
   this.fd.listen(address, port).then(function () {
-    console.log('listening on port ' + port);
+    console.log('Listening on port ' + port);
   }, function (err) {
-    console.log('could not listen', err);
+    console.log('Could not listen', err);
   });
 }
 
 FreedomTCP.prototype.open = function (fd) {
   if (fd !== this.fileDescriptor) {
-    console.warn('not supported');
+    console.warn('Not supported');
   }
 }
 
