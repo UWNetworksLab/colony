@@ -46,6 +46,10 @@ ssh.prototype.startSocksTunnel = function (serverIp, username, privateKey) {
 
   // Handler function when our SOCKS5 server receives a connection
   var onConnection = function (info, accept, deny) {
+    // NOTE(kennysong): The commented out section is an attempt to use the same
+    // SSH connection for multiple requests. It currently establishes a new SSH
+    // connection per request.
+
     // if (self.activeClient !== undefined) {
     //   // Use existing SSH connection
     //   console.log("Received request; reusing existing SSH connection...");
