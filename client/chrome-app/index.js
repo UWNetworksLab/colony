@@ -1,5 +1,5 @@
 var ssh;
-var serverName = 'uProxyColony';
+var serverName = 'uProxyColonyChrome';
 var colonyStarted = false;
 
 var start = function (instance) {

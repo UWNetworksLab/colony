@@ -51,6 +51,32 @@ gulp.task('copy_forge_min', function(){
 
 gulp.task('copy_chrome_app', function () {
   'use strict';
+  // Copy ssh2-streams and socksv5 node_modules to client/chrome-app/lib
+  // We're replacing some files with slightly modified versions
+  gulp.src('./node_modules/ssh2/node_modules/ssh2-streams/node_modules/*')
+    .pipe(gulp.dest('./client/chrome-app/lib/ssh2-streams/node_modules/'));
+  gulp.src(['./node_modules/ssh2/node_modules/ssh2-streams/index.js',
+            './node_modules/ssh2/node_modules/ssh2-streams/package.json'
+    ]).pipe(gulp.dest('./client/chrome-app/lib/ssh2-streams/'));
+  gulp.src(['./node_modules/ssh2/node_modules/ssh2-streams/lib/constants.js',
+            './node_modules/ssh2/node_modules/ssh2-streams/lib/keyParser.js',
+            './node_modules/ssh2/node_modules/ssh2-streams/lib/utils.js',
+    ]).pipe(gulp.dest('./client/chrome-app/lib/ssh2-streams/lib/'));
+
+  gulp.src('./node_modules/socksv5/node_modules/*')
+    .pipe(gulp.dest('./client/chrome-app/lib/socksv5/node_modules/'));
+  gulp.src('./node_modules/socksv5/package.json')
+    .pipe(gulp.dest('./client/chrome-app/lib/socksv5/'));
+  gulp.src(['./node_modules/socksv5/lib/Agents.js',
+            './node_modules/socksv5/lib/client.js',
+            './node_modules/socksv5/lib/client.parser.js',
+            './node_modules/socksv5/lib/constants.js',
+            './node_modules/socksv5/lib/server.parser.js',
+            './node_modules/socksv5/lib/utils.js',
+    ]).pipe(gulp.dest('./client/chrome-app/lib/socksv5/lib/'));
+  gulp.src('./node_modules/socksv5/lib/auth/*')
+    .pipe(gulp.dest('./client/chrome-app/lib/socksv5/lib/auth/'));
+
   // Copy all relevant files to client/build/chrome-app
   gulp.src([
     './client/chrome-app/background.js',
@@ -103,7 +129,7 @@ gulp.task('browserify_chrome_app', function () {
     .pipe(gulp.dest('./client/build/chrome-app'));
 });
 
-gulp.task('build_chrome_app', ['copy_chrome_app', 'browserify_chrome_app']);
+gulp.task('build_chrome_app', gulpSequence('copy_chrome_app', 'browserify_chrome_app'));
 
 gulp.task("lint", function() {
   "use strict";
