@@ -146,10 +146,10 @@ DigitalOceanServer.prototype.start = function(accessToken, name) {
 
     // TODO: What if we don't have the keys here?
     // Check if there is an existing droplet with name, and start it
-    var droplets = body.droplets;
     if (err) {
       return deferred.reject(err);
     }
+    var droplets = body.droplets;
 
     function queryIPAndResolve(dropletId) {
       queryIpAddress(client, dropletId).then(function (ips) {
@@ -161,7 +161,7 @@ DigitalOceanServer.prototype.start = function(accessToken, name) {
     for (var i = 0; i < droplets.length; i += 1) {
       if (droplets[i].name === name) {
         if (droplets[i].status === "active" || droplets[i].status === "in-progress") {
-          return deferred.resolve(queryIpAddress(client, droplets[i].id));
+          return queryIPAndResolve(droplets[i].id);
         } else {
           return startServer(client, droplets[i].id).
               then(queryIPAndResolve.bind({}, droplets[i].id));
@@ -173,8 +173,18 @@ DigitalOceanServer.prototype.start = function(accessToken, name) {
     emit('statusUpdate', 'Creating key');
     var pair = getKeyPair();
     var sshKey = pair.public;
-    window.localStorage.setItem("DigitalOcean-" + name + "-PublicKey", pair.public);
-    window.localStorage.setItem("DigitalOcean-" + name + "-PrivateKey", pair.private);  // TODO: Is this safe?
+
+    // Store key pair in localstorage
+    if (chrome && chrome.storage) {
+      // We use chrome.storage instead of localstorage in a Chrome app context
+      var keys = {};
+      keys["DigitalOcean-" + name + "-PublicKey"] = pair.public;
+      keys["DigitalOcean-" + name + "-PrivateKey"] = pair.private;
+      chrome.storage.local.set(keys);
+    } else {
+      window.localStorage.setItem("DigitalOcean-" + name + "-PublicKey", pair.public);
+      window.localStorage.setItem("DigitalOcean-" + name + "-PrivateKey", pair.private);
+    }
 
     // Create a droplet with this SSH key as an authorized key
     emit('statusUpdate', 'Adding key');

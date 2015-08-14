@@ -21,21 +21,28 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "http-proxy": "^1.11.1",
-    "socksv5": "0.0.6"
+    "http-proxy": "^1.11.1"
   },
   "devDependencies": {
+    "aliasify": "^1.7.2",
     "browser-request": "^0.3.3",
     "browserify": "^10.2.3",
     "cordova": "^5.0.0",
+    "crypto-browserify": "^3.9.14",
     "do-wrapper": "^2.1.1",
     "forge-min": "^0.6.20",
+    "freedom-for-chrome": "^0.4.20",
+    "freedom-for-node": "~0.2.12",
     "fs-extra": "^0.18.4",
-    "gulp": "^3.8.11",
+    "gulp": "^3.9.0",
     "gulp-jshint": "^1.11.0",
     "gulp-sequence": "^0.3.2",
+    "merge-stream": "^1.0.0",
     "pkgify": "^1.0.2",
     "q": "^1.4.1",
+    "socksv5": "0.0.6",
+    "ssh2": "0.4.10",
+    "ssh2-streams": "0.0.15",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   }

@@ -1,0 +1,34 @@
+{
+  "name": "ssh",
+  "description": "Freedom SSH manifest",
+  "app": {
+    "script": "freedom-ssh-bundle.js"
+  },
+  "constraints": {
+    "isolation": "never"
+  },
+  "provides" : [
+    "ssh"
+  ],
+  "default": "ssh",
+  "api": {
+    "ssh": {
+      "connect": {
+        "type": "method",
+        "value": ["string", "string", "string"]
+      },
+      "startSocksTunnel": {
+        "type": "method",
+        "value": ["string", "string", "string"]
+      },
+      "closeSsh": {
+        "type": "method",
+        "value": []
+      }
+    }
+  },
+  "permissions": [
+    "core.udpsocket",
+    "core.tcpsocket"
+  ]
+}

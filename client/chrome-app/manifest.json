@@ -1,0 +1,29 @@
+{
+  "name": "colony-chrome-app",
+  "description": "Chrome app version of Colony",
+  "version": "0.1",
+  "manifest_version": 2,
+  "sockets": {
+    "udp": {
+        "send": "*",
+        "bind": "*"
+    },
+    "tcp": { 
+      "connect": "*"
+    },
+    "tcpServer": {
+      "listen": "*"
+    }
+  },
+  "app": {
+    "background": {
+      "scripts": ["background.js"]
+    }
+  },
+  "permissions": [
+    "http://*/",
+    "system.network",
+    "identity",
+    "storage"
+  ]
+}

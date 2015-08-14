@@ -28,6 +28,13 @@ build/Release
 # Dependency directory
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
 node_modules/
+client/chrome-app/lib/ssh2-streams/
+client/chrome-app/lib/socksv5/
+!client/chrome-app/lib/ssh2-streams/lib/sftp.js
+!client/chrome-app/lib/ssh2-streams/lib/ssh.js
+!client/chrome-app/lib/socksv5/lib/server.js
+!client/chrome-app/lib/socksv5/index.js
+
 
 ### Cordova
 client/build/
