@@ -54,14 +54,14 @@ gulp.task('copy_chrome_app', function () {
   'use strict';
   // Copy the module ssh2-streams to client/chrome-app/lib
   // We're replacing some files with slightly modified versions
-  var ss1 = gulp.src('./node_modules/ssh2/node_modules/ssh2-streams/node_modules/**/*')
+  var ss1 = gulp.src('./node_modules/ssh2-streams/node_modules/**/*')
     .pipe(gulp.dest('./client/chrome-app/lib/ssh2-streams/node_modules/'));
-  var ss2 = gulp.src(['./node_modules/ssh2/node_modules/ssh2-streams/index.js',
-            './node_modules/ssh2/node_modules/ssh2-streams/package.json'
+  var ss2 = gulp.src(['./node_modules/ssh2-streams/index.js',
+            './node_modules/ssh2-streams/package.json'
     ]).pipe(gulp.dest('./client/chrome-app/lib/ssh2-streams/'));
-  var ss3 = gulp.src(['./node_modules/ssh2/node_modules/ssh2-streams/lib/constants.js',
-            './node_modules/ssh2/node_modules/ssh2-streams/lib/keyParser.js',
-            './node_modules/ssh2/node_modules/ssh2-streams/lib/utils.js',
+  var ss3 = gulp.src(['./node_modules/ssh2-streams/lib/constants.js',
+            './node_modules/ssh2-streams/lib/keyParser.js',
+            './node_modules/ssh2-streams/lib/utils.js',
     ]).pipe(gulp.dest('./client/chrome-app/lib/ssh2-streams/lib/'));
 
   // Copy the module socksv5 to client/chrome-app/lib, same reason as above
