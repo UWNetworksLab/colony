@@ -21,9 +21,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "http-proxy": "^1.11.1",
-    "socksv5": "0.0.6",
-    "ssh2": "^0.4.10"
+    "http-proxy": "^1.11.1"
   },
   "devDependencies": {
     "aliasify": "^1.7.2",
@@ -33,6 +31,7 @@
     "crypto-browserify": "^3.9.14",
     "do-wrapper": "^2.1.1",
     "forge-min": "^0.6.20",
+    "freedom-for-chrome": "^0.4.20",
     "freedom-for-node": "~0.2.12",
     "fs-extra": "^0.18.4",
     "gulp": "^3.9.0",
@@ -42,6 +41,7 @@
     "pkgify": "^1.0.2",
     "q": "^1.4.1",
     "socksv5": "0.0.6",
+    "ssh2": "0.4.10",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   }
