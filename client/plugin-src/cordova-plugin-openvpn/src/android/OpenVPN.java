@@ -7,137 +7,134 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.util.List;
-
 import android.util.Log;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.Context;
 import android.content.ComponentName;
 import android.content.ServiceConnection;
+import android.net.VpnService;
 import android.os.IBinder;
 import android.os.RemoteException;
 
-import de.blinkt.openvpn.api.APIVpnProfile;
-import de.blinkt.openvpn.api.IOpenVPNAPIService;
-import de.blinkt.openvpn.api.IOpenVPNStatusCallback;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringReader;
 
+import de.blinkt.openvpn.VpnProfile;
+import de.blinkt.openvpn.api.GrantPermissionsActivity;
+import de.blinkt.openvpn.core.ConfigParser;
+import de.blinkt.openvpn.core.OpenVPNService;
+import de.blinkt.openvpn.core.ProfileManager;
+import de.blinkt.openvpn.core.VPNLaunchHelper;
 
 public class OpenVPN extends CordovaPlugin {
-  private static final int MSG_UPDATE_STATE = 0;
-  private static final int MSG_UPDATE_MYIP = 1;
-  private static final int START_PROFILE_EMBEDDED = 2;
-  private static final int START_PROFILE_BYUUID = 3;
-  private static final int ICS_OPENVPN_PERMISSION = 7;
-  private static final int PROFILE_ADD_NEW = 8;
-  protected IOpenVPNAPIService mService=null;
-  private String mStartUUID=null;
+  final static String LOG_TAG = "OpenVPNPlugin";
+
+  private static final int PREPARE_VPN = 0;
+
+  private OpenVPNService mService;
 
   @Override
   protected void pluginInitialize() {
-    Intent icsopenvpnService = new Intent(IOpenVPNAPIService.class.getName());
-    icsopenvpnService.setPackage("de.blinkt.openvpn");
-    this.cordova.getActivity().bindService(icsopenvpnService, mConnection, Context.BIND_AUTO_CREATE);
+    Log.d(LOG_TAG, "OpenVPNPlugin initializing.");
+    // Start service.
+    Intent serviceIntent = new Intent(getBaseContext(), OpenVPNService.class);
+    this.cordova.getActivity().startService(serviceIntent);
+    // Bind service.
+    Intent intent = new Intent(getBaseContext(), OpenVPNService.class);
+    intent.setAction(OpenVPNService.START_SERVICE);
+    this.cordova.getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
+    prepareVPNService();
   }
 
   @Override
   public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-    if (action.equals("listProfiles")) {
-      this.listProfiles(callbackContext);
-    } else if (action.equals("startVPN")) {
+    if (action.equals("startVPN")) {
       String inlineConfig = args.getString(0);
       this.startVPN(inlineConfig, callbackContext);
+      return true;
+    } else if (action.equals("stopVPN")) {
+      this.stopVPN();
+      return true;
     }
     return false;
   }
 
-  /**
-   * Class for interacting with the main interface of the service.
-   */
   private ServiceConnection mConnection = new ServiceConnection() {
+    @Override
     public void onServiceConnected(ComponentName className,
-                                    IBinder service) {
-      // This is called when the connection with the service has been
-      // established, giving us the service object we can use to
-      // interact with the service.  We are communicating with our
-      // service through an IDL interface, so get a client-side
-      // representation of that from the raw service object.
-      mService = IOpenVPNAPIService.Stub.asInterface(service);
-
-      try {
-        // Request permission to use the API
-        Intent i = mService.prepare(cordova.getActivity().getPackageName());
-        if (i != null) {
-          cordova.getActivity().startActivityForResult(i, ICS_OPENVPN_PERMISSION);
-        } else {
-          onActivityResult(ICS_OPENVPN_PERMISSION, Activity.RESULT_OK, null);
-        }
-      } catch (RemoteException e) {
-        e.printStackTrace();
-      }
+                                   IBinder service) {
+      OpenVPNService.LocalBinder binder = (OpenVPNService.LocalBinder)service;
+      mService = binder.getService();
     }
-
-    public void onServiceDisconnected(ComponentName className) {
-      // This is called when the connection with the service has been
-      // unexpectedly disconnected -- that is, its process crashed.
-      mService = null;
-    }
-  };
-
-  // @todo Not sure what any of this does. Need to check for codes from OpenVPN
-  public void onActivityResult(int requestCode, int resultCode, Intent data) {
-    if (resultCode == Activity.RESULT_OK) {
-      if (requestCode == ICS_OPENVPN_PERMISSION) {
-        try {
-          mService.registerStatusCallback(mCallback);
-        } catch (RemoteException e) {
-          e.printStackTrace();
-        }
-      }
-    }
-  };
-
-  private IOpenVPNStatusCallback mCallback = new IOpenVPNStatusCallback.Stub() {
-    /**
-    * This is called by the remote service regularly to tell us about
-    * new values.  Note that IPC calls are dispatched through a thread
-    * pool running in each process, so the code executing here will
-    * NOT be running in our main thread like most other things -- so,
-    * to update the UI, we need to use a Handler to hop over there.
-    */
 
     @Override
-    public void newStatus(String uuid, String state, String message, String level)
-                throws RemoteException {
-      //@todo handle these messages from OpenVPN
+    public void onServiceDisconnected(ComponentName arg0) {
+        Log.i(LOG_TAG, "VPN disconnected.");
+        mService = null;
     }
   };
 
-  private void listProfiles(CallbackContext callbackContext) {
-    try {
-      List<APIVpnProfile> list = mService.getProfiles();
-      String all="List:";
-      for(APIVpnProfile vp : list.subList(0, Math.min(5, list.size()))) {
-        all = all + vp.mName + ":" + vp.mUUID + "\n";
-        //mStartUUID = list.get(0).mUUID;
-      }
-      if (list.size() > 5) {
-        all +="\n And some profiles....";
-      }
-      callbackContext.success(all);
-    } catch (RemoteException e) {
-      callbackContext.error(e.getMessage());
+  private void prepareVPNService() {
+    if (VpnService.prepare(getBaseContext()) == null) {
+      Log.d(LOG_TAG, "Prepared OpenVPN service.");
+    } else {
+      Intent requestPermission = new Intent(getBaseContext(), GrantPermissionsActivity.class);
+      this.cordova.getActivity().startActivityForResult(requestPermission, PREPARE_VPN);
     }
   }
 
   private void startVPN(String inlineConfig, CallbackContext callbackContext) {
+    ConfigParser cp = new ConfigParser();
     try {
-      mService.startVPN(inlineConfig);
-    } catch(RemoteException e) {
+      cp.parseConfig(new StringReader(inlineConfig));
+      VpnProfile vp = cp.convertProfile();
+      vp.mName = "OpenVPN";
+      vp.mProfileCreator = getBaseContext().getPackageName();
+      if (vp.checkProfile(getBaseContext()) !=
+            de.blinkt.openvpn.R.string.no_error_found) {
+          callbackContext.error(
+              getBaseContext().getString(vp.checkProfile(getBaseContext())));
+      }
+
+      ProfileManager.setTemporaryProfile(vp);
+      startVPNWithProfile(vp);
+    } catch (ConfigParser.ConfigParseError e) {
+      callbackContext.error(e.getMessage());
+    } catch (IOException e) {
       callbackContext.error(e.getMessage());
     }
+  }
+
+  private void startVPNWithProfile(VpnProfile vp) {
+    Intent vpnPermissionIntent = VpnService.prepare(getBaseContext());
+    int needPassword = vp.needUserPWInput(false);
+
+    if(vpnPermissionIntent != null || needPassword != 0){
+      Intent shortVPNIntent = new Intent(Intent.ACTION_MAIN);
+      shortVPNIntent.setClass(getBaseContext(), de.blinkt.openvpn.LaunchVPN.class);
+      shortVPNIntent.putExtra(de.blinkt.openvpn.LaunchVPN.EXTRA_KEY, vp.getUUIDString());
+      shortVPNIntent.putExtra(de.blinkt.openvpn.LaunchVPN.EXTRA_HIDELOG, true);
+      shortVPNIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      this.cordova.getActivity().startActivity(shortVPNIntent);
+    } else {
+      Log.d(LOG_TAG, "Starting OpenVPN.");
+      VPNLaunchHelper.startOpenVpn(vp, getBaseContext());
+    }
+  }
+
+  private void stopVPN() {
+    if (mService != null && mService.getManagement() != null) {
+        mService.getManagement().stopVPN(false);
+    }
+  }
+
+  private Context getBaseContext() {
+    return this.cordova.getActivity().getApplicationContext();
   }
 
 }

@@ -77,3 +77,4 @@ xcuserdata
 profile
 *.moved-aside
 IOS/www/
+*.DS_Store
