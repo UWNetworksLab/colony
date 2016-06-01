@@ -2,7 +2,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         id="cordova-plugin-openvpn" version="1.0.0">
   <name>OpenVPN</name>
-  <description>Captures an oAuth Token and redirects back to app</description>
+  <description>OpenVPN service for Android</description>
   <license>Apache 2.0</license>
   <keywords>cordova,openvpn</keywords>
 
@@ -19,7 +19,9 @@
     </config-file>
 
     <source-file src="src/android/OpenVPN.java" target-dir="src/org/apache/cordova/openvpn" />
-    <source-file src="src/android/aidl/de" target-dir="src" />
+    <framework src="src/android/build.gradle" custom="true" type="gradleReference" />
+
+    <resource-file src="libs/openvpnlib.aar" target="libs/openvpnlib.aar" />
 
     <js-module src="openvpn.js" name="openvpn">
       <clobbers target="openvpn" />
