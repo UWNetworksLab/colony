@@ -50,10 +50,10 @@ public class OpenVPN extends CordovaPlugin {
     if (action.equals(ACTION_START_VPN)) {
       if (args.length() < 1) {
         callbackContext.error("Cannot start VPN without config.");
-      } else {
-        String vpnConfig = args.getString(0);
-        this.startVPN(vpnConfig, callbackContext);
+        return true;
       }
+      String vpnConfig = args.getString(0);
+      startVPN(vpnConfig, callbackContext);
       return true;
     } else if (action.equals(ACTION_STOP_VPN)) {
       stopVPN();
@@ -118,7 +118,7 @@ public class OpenVPN extends CordovaPlugin {
   private void startVPNWithProfile(VpnProfile vp) {
     Intent vpnPermissionIntent = VpnService.prepare(getBaseContext());
     int needPassword = vp.needUserPWInput(false);
-    if(vpnPermissionIntent != null || needPassword != 0){
+    if (vpnPermissionIntent != null || needPassword != 0) {
       // VPN has not been prepared, this intent will prompt the user for
       // permissions, and subsequently launch OpenVPN.
       Intent shortVPNIntent = new Intent(Intent.ACTION_MAIN);
