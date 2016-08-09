@@ -20,6 +20,13 @@ Then install the following from npm
     npm install -g gulp
 
 ## Setup
+
+### OpenVPN plugin setup
+
+The OpenVPN plugin depends on a library version of OpenVPN for Android. Clone the [library](https://github.com/albertolalama/android-openvpn-lib), and follow the [instructions](https://github.com/albertolalama/android-openvpn-lib/blob/master/doc/README.txt) to build it. Copy the output ```.aar``` file into ```client/plugin-src/cordova-plugin-openvpn/openvpnlib.aar```.
+
+### Project setup
+
 These commands only need to be run once
 
     npm install
@@ -28,6 +35,7 @@ These commands only need to be run once
 If you mess up and want to wipe the cordova workspace:
 
     gulp clean
+
 
 ## Develop
 From the top-level directory, the default gulp task will lint, build, and run an emulator

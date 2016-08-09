@@ -27,7 +27,7 @@
   "devDependencies": {
     "browser-request": "^0.3.3",
     "browserify": "^10.2.3",
-    "cordova": "^5.0.0",
+    "cordova": "^6.0.0",
     "do-wrapper": "^2.1.1",
     "forge-min": "^0.6.20",
     "fs-extra": "^0.18.4",

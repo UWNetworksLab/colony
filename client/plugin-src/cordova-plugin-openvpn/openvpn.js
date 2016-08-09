@@ -10,6 +10,5 @@ window.vpn._genericHandler = function(method, params) {
   });
 };
 
-window.vpn.listProfiles = window.vpn._genericHandler.bind({}, "listProfiles");
 window.vpn.startVPN = window.vpn._genericHandler.bind({}, "startVPN");
-
+window.vpn.stopVPN = window.vpn._genericHandler.bind({}, "stopVPN");

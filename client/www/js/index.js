@@ -114,14 +114,14 @@ app.onOAuthToken = function(responseUrl) {
         document.getElementById("status").innerText = 'Starting VPN';
         return window.vpn.startVPN(ovpnFile.text);
       }).then(function (vpnResult) {
-        // This seems to never get called (see catch block)
+        document.getElementById("status").innerText = vpnResult;
         console.log('vpnResult: ', vpnResult);
       }).catch(function (err) {
         console.log(err);
         // Reconnect if SSH failed (sometimes fails right after new droplet creation)
         if (err.indexOf('ECONNREFUSED') !== -1) {
           setTimeout(connectToSsh, 10*1000);
-        // vpn.startVPN() will always reject with this error 
+        // vpn.startVPN() will always reject with this error
         // TODO: Figure out what's going on here
         } else if (err.indexOf('Invalid action') !== -1) {
           console.log('Check VPN in notification bar');
@@ -130,7 +130,7 @@ app.onOAuthToken = function(responseUrl) {
       });
     }
     connectToSsh();
-    
+
   });
 };
 
